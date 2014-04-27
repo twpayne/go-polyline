@@ -39,9 +39,11 @@ func EncodeCoords(coords [][]float64, result []byte) []byte {
 	lastLat, lastLong := 0, 0
 	for _, coord := range coords {
 		lat, long := int(1e5*coord[0]), int(1e5*coord[1])
-		result = EncodeInt(lat-lastLat, result)
-		result = EncodeInt(long-lastLong, result)
-		lastLat, lastLong = lat, long
+		if lat != lastLat && long != lastLong {
+			result = EncodeInt(lat-lastLat, result)
+			result = EncodeInt(long-lastLong, result)
+			lastLat, lastLong = lat, long
+		}
 	}
 	return result
 }
