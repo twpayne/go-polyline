@@ -76,6 +76,28 @@ func EncodeInt(i int, buf []byte) []byte {
 	return EncodeUint(u, buf)
 }
 
+// DecodeFloat64 decodes a single float64 from buf.
+func (c Codec) DecodeFloat64(buf []byte) (float64, []byte, error) {
+	i, buf, err := DecodeInt(buf)
+	if err != nil {
+		return 0, nil, err
+	}
+	return float64(i) / c.Scale, buf, nil
+}
+
+// DecodeCoord decodes a single coordinate from buf.
+func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
+	coord := make([]float64, c.Dim)
+	for i := range coord {
+		var err error
+		coord[i], buf, err = c.DecodeFloat64(buf)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	return coord, buf, nil
+}
+
 // EncodeFloat64 appends the encoding of a single float64 f to buf.
 func (c Codec) EncodeFloat64(f float64, buf []byte) []byte {
 	return EncodeInt(int(round(c.Scale*f)), buf)
@@ -91,6 +113,11 @@ func (c Codec) EncodeCoords(coords [][]float64, buf []byte) []byte {
 		}
 	}
 	return buf
+}
+
+// DecodeCoord decodes a single coordinate from buf.
+func DecodeCoord(buf []byte) ([]float64, []byte, error) {
+	return defaultCodec.DecodeCoord(buf)
 }
 
 // EncodeFloat64 appends the encoding of a single float64 f to buf.

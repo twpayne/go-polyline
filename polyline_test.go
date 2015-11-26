@@ -2,6 +2,7 @@ package polyline
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -52,6 +53,22 @@ func TestInt(t *testing.T) {
 		}
 		if got := EncodeInt(c.i, nil); string(got) != c.s {
 			t.Errorf("EncodeInt(%v) = %v, want %v", c.i, string(got), c.s)
+		}
+	}
+}
+
+func TestDecodeCoord(t *testing.T) {
+	for _, c := range []struct {
+		s string
+		c []float64
+	}{
+		{
+			s: "_p~iF~ps|U",
+			c: []float64{38.5, -120.2},
+		},
+	} {
+		if got, b, err := DecodeCoord([]byte(c.s)); !reflect.DeepEqual(got, c.c) || len(b) != 0 || err != nil {
+			t.Errorf("DecodeCoord(%v) = %v, %v, %v, want %v, nil, nil", c.s, got, err, string(b), c.c)
 		}
 	}
 }
