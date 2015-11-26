@@ -98,6 +98,14 @@ func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return coord, buf, nil
 }
 
+// EncodeCoord encodes a single coordinate to buf.
+func (c Codec) EncodeCoord(coord []float64, buf []byte) []byte {
+	for _, x := range coord {
+		buf = c.EncodeFloat64(x, buf)
+	}
+	return buf
+}
+
 // EncodeFloat64 appends the encoding of a single float64 f to buf.
 func (c Codec) EncodeFloat64(f float64, buf []byte) []byte {
 	return EncodeInt(int(round(c.Scale*f)), buf)
@@ -123,6 +131,11 @@ func DecodeCoord(buf []byte) ([]float64, []byte, error) {
 // EncodeFloat64 appends the encoding of a single float64 f to buf.
 func EncodeFloat64(f float64, buf []byte) []byte {
 	return defaultCodec.EncodeFloat64(f, buf)
+}
+
+// EncodeCoord appends the encoding of an array of coordinates coords to buf.
+func EncodeCoord(coord []float64, buf []byte) []byte {
+	return defaultCodec.EncodeCoord(coord, buf)
 }
 
 // EncodeCoords appends the encoding of an array of coordinates coords to buf.

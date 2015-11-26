@@ -57,7 +57,7 @@ func TestInt(t *testing.T) {
 	}
 }
 
-func TestDecodeCoord(t *testing.T) {
+func TestCoord(t *testing.T) {
 	for _, c := range []struct {
 		s string
 		c []float64
@@ -69,6 +69,9 @@ func TestDecodeCoord(t *testing.T) {
 	} {
 		if got, b, err := DecodeCoord([]byte(c.s)); !reflect.DeepEqual(got, c.c) || len(b) != 0 || err != nil {
 			t.Errorf("DecodeCoord(%v) = %v, %v, %v, want %v, nil, nil", c.s, got, err, string(b), c.c)
+		}
+		if got := EncodeCoord(c.c, nil); string(got) != c.s {
+			t.Errorf("EncodeCoord(%v, nil) = %v, want %v", c.c, got, string(got), c.s)
 		}
 	}
 }
