@@ -15,18 +15,21 @@ func ExampleEncodeCoords() {
 	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 
-func TestEncodeUint(t *testing.T) {
+func TestUint(t *testing.T) {
 	for _, c := range []struct {
-		u    uint
-		want string
+		u uint
+		s string
 	}{
-		{u: 0, want: "?"},
-		{u: 31, want: "^"},
-		{u: 32, want: "_@"},
-		{u: 174, want: "mD"},
+		{u: 0, s: "?"},
+		{u: 31, s: "^"},
+		{u: 32, s: "_@"},
+		{u: 174, s: "mD"},
 	} {
-		if got := EncodeUint(c.u, nil); string(got) != c.want {
-			t.Errorf("EncodeUint(%v) = %v, want %v", c.u, string(got), c.want)
+		if got, b, err := DecodeUint([]byte(c.s)); got != c.u || len(b) != 0 || err != nil {
+			t.Errorf("DecodeUint(%v) = %v, %v, %v, want %v, nil, nil", c.s, got, err, string(b), c.u)
+		}
+		if got := EncodeUint(c.u, nil); string(got) != c.s {
+			t.Errorf("EncodeUint(%v) = %v, want %v", c.u, string(got), c.s)
 		}
 	}
 }

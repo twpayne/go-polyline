@@ -4,6 +4,7 @@
 package polyline
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -22,6 +23,24 @@ type Codec struct {
 }
 
 var defaultCodec = Codec{Dim: 2, Scale: 1e5}
+
+// DecodeUint decodes a single unsigned integer from buf.
+func DecodeUint(buf []byte) (uint, []byte, error) {
+	var u, shift uint
+	for i, b := range buf {
+		switch {
+		case 63 <= b && b < 95:
+			u += (uint(b) - 63) << shift
+			return u, buf[i+1:], nil
+		case 95 <= b && b < 127:
+			u += (uint(b) - 95) << shift
+			shift += 5
+		default:
+			return 0, nil, fmt.Errorf("invalid byte %#v", b)
+		}
+	}
+	return 0, nil, fmt.Errorf("unterminated sequence %#v", buf)
+}
 
 // EncodeUint appends the encoding of a single unsigned integer u to buf.
 func EncodeUint(u uint, buf []byte) []byte {
