@@ -1,8 +1,8 @@
-# gopolyline2
+# polyline
 
 Package polyline implements a Google Maps Encoding Polyline encoder.
 
-See https://godoc.org/github.com/twpayne/gopolyline2/polyline.
+See https://godoc.org/github.com/twpayne/go-polyline.
 
 Example:
 
