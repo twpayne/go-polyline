@@ -7,22 +7,10 @@ func TestEncodeUint(t *testing.T) {
 		u    uint
 		want string
 	}{
-		{
-			u:    0,
-			want: "?",
-		},
-		{
-			u:    31,
-			want: "^",
-		},
-		{
-			u:    32,
-			want: "_@",
-		},
-		{
-			u:    174,
-			want: "mD",
-		},
+		{u: 0, want: "?"},
+		{u: 31, want: "^"},
+		{u: 32, want: "_@"},
+		{u: 174, want: "mD"},
 	} {
 		if got := EncodeUint(c.u, nil); string(got) != c.want {
 			t.Errorf("EncodeUint(%v) = %v, want %v", c.u, string(got), c.want)
@@ -35,18 +23,9 @@ func TestEncodeInt(t *testing.T) {
 		i    int
 		want string
 	}{
-		{
-			i:    3850000,
-			want: "_p~iF",
-		},
-		{
-			i:    -12020000,
-			want: "~ps|U",
-		},
-		{
-			i:    -17998321,
-			want: "`~oia@",
-		},
+		{i: 3850000, want: "_p~iF"},
+		{i: -12020000, want: "~ps|U"},
+		{i: -17998321, want: "`~oia@"},
 	} {
 		if got := EncodeInt(c.i, nil); string(got) != c.want {
 			t.Errorf("EncodeInt(%v) = %v, want %v", c.i, string(got), c.want)
