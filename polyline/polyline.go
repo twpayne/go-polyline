@@ -13,7 +13,7 @@ func round(x float64) float64 {
 }
 
 func EncodeUint(u uint, result []byte) []byte {
-	for u > 32 {
+	for u >= 32 {
 		result = append(result, byte((u&31)+95))
 		u = u >> 5
 	}

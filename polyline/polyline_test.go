@@ -8,6 +8,18 @@ func TestEncodeUint(t *testing.T) {
 		want string
 	}{
 		{
+			u:    0,
+			want: "?",
+		},
+		{
+			u:    31,
+			want: "^",
+		},
+		{
+			u:    32,
+			want: "_@",
+		},
+		{
 			u:    174,
 			want: "mD",
 		},
