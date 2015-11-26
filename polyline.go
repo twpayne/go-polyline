@@ -15,6 +15,14 @@ func round(x float64) float64 {
 	}
 }
 
+// A Codec represents an encoder.
+type Codec struct {
+	Dim   int     // Dimensionality, normally 2
+	Scale float64 // Scale, normally 1e5
+}
+
+var defaultCodec = Codec{Dim: 2, Scale: 1e5}
+
 // EncodeUint appends the encoding of a single unsigned integer u to result.
 func EncodeUint(u uint, result []byte) []byte {
 	for u >= 32 {
@@ -37,20 +45,28 @@ func EncodeInt(i int, result []byte) []byte {
 }
 
 // EncodeFloat64 appends the encoding of a single float64 f to result.
+func (c Codec) EncodeFloat64(f float64, result []byte) []byte {
+	return EncodeInt(int(round(c.Scale*f)), result)
+}
+
+// EncodeCoords appends the encoding of an array of coordinates coords to result.
+func (c Codec) EncodeCoords(coords [][]float64, result []byte) []byte {
+	last := make([]float64, c.Dim)
+	for _, coord := range coords {
+		for i, x := range coord {
+			result = c.EncodeFloat64(x-last[i], result)
+			last[i] = x
+		}
+	}
+	return result
+}
+
+// EncodeFloat64 appends the encoding of a single float64 f to result.
 func EncodeFloat64(f float64, result []byte) []byte {
-	return EncodeInt(int(round(1e5*f)), result)
+	return defaultCodec.EncodeFloat64(f, result)
 }
 
 // EncodeCoords appends the encoding of an array of coordinates coords to result.
 func EncodeCoords(coords [][]float64, result []byte) []byte {
-	lastLat, lastLong := 0, 0
-	for _, coord := range coords {
-		lat, long := int(1e5*coord[0]), int(1e5*coord[1])
-		if lat != lastLat && long != lastLong {
-			result = EncodeInt(lat-lastLat, result)
-			result = EncodeInt(long-lastLong, result)
-			lastLat, lastLong = lat, long
-		}
-	}
-	return result
+	return defaultCodec.EncodeCoords(coords, result)
 }
