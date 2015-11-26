@@ -1,6 +1,19 @@
 package polyline
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+func ExampleEncodeCoords() {
+	var coords = [][]float64{
+		[]float64{38.5, -120.2},
+		[]float64{40.7, -120.95},
+		[]float64{43.252, -126.453},
+	}
+	fmt.Printf("%s\n", EncodeCoords(coords, nil))
+	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
+}
 
 func TestEncodeUint(t *testing.T) {
 	for _, c := range []struct {
