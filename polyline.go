@@ -42,6 +42,19 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 	return 0, nil, fmt.Errorf("unterminated sequence %#v", buf)
 }
 
+// DecodeInt decodes a single signed integer from buf.
+func DecodeInt(buf []byte) (int, []byte, error) {
+	u, buf, err := DecodeUint(buf)
+	if err != nil {
+		return 0, nil, err
+	}
+	if u&1 == 0 {
+		return int(u >> 1), buf, nil
+	} else {
+		return -int((u + 1) >> 1), buf, nil
+	}
+}
+
 // EncodeUint appends the encoding of a single unsigned integer u to buf.
 func EncodeUint(u uint, buf []byte) []byte {
 	for u >= 32 {

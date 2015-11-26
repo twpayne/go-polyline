@@ -34,17 +34,24 @@ func TestUint(t *testing.T) {
 	}
 }
 
-func TestEncodeInt(t *testing.T) {
+func TestInt(t *testing.T) {
 	for _, c := range []struct {
-		i    int
-		want string
+		i int
+		s string
 	}{
-		{i: 3850000, want: "_p~iF"},
-		{i: -12020000, want: "~ps|U"},
-		{i: -17998321, want: "`~oia@"},
+		{i: 3850000, s: "_p~iF"},
+		{i: -12020000, s: "~ps|U"},
+		{i: -17998321, s: "`~oia@"},
+		{i: 220000, s: "_ulL"},
+		{i: -75000, s: "nnqC"},
+		{i: 255200, s: "_mqN"},
+		{i: -550300, s: "vxq`@"},
 	} {
-		if got := EncodeInt(c.i, nil); string(got) != c.want {
-			t.Errorf("EncodeInt(%v) = %v, want %v", c.i, string(got), c.want)
+		if got, b, err := DecodeInt([]byte(c.s)); got != c.i || len(b) != 0 || err != nil {
+			t.Errorf("DecodeInt(%v) = %v, %v, %v, want %v, nil, nil", c.s, got, err, string(b), c.i)
+		}
+		if got := EncodeInt(c.i, nil); string(got) != c.s {
+			t.Errorf("EncodeInt(%v) = %v, want %v", c.i, string(got), c.s)
 		}
 	}
 }
