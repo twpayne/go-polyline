@@ -156,8 +156,7 @@ func TestCoordsQuick(t *testing.T) {
 				return false
 			}
 			for j, x := range c {
-				// FIXME the tolerance should be 2e-6
-				if math.Abs(x-qc[i][j]) > 1e-4 {
+				if math.Abs(x-qc[i][j]) > 5e-6 {
 					return false
 				}
 			}

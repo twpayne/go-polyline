@@ -130,11 +130,12 @@ func (c Codec) EncodeCoord(coord []float64, buf []byte) []byte {
 
 // EncodeCoords appends the encoding of an array of coordinates coords to buf.
 func (c Codec) EncodeCoords(coords [][]float64, buf []byte) []byte {
-	last := make([]float64, c.Dim)
+	last := make([]int, c.Dim)
 	for _, coord := range coords {
 		for i, x := range coord {
-			buf = EncodeInt(int(round(c.Scale*(x-last[i]))), buf)
-			last[i] = x
+			ex := int(round(c.Scale * x))
+			buf = EncodeInt(ex-last[i], buf)
+			last[i] = ex
 		}
 	}
 	return buf
