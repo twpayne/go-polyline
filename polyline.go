@@ -4,8 +4,13 @@
 package polyline
 
 import (
-	"fmt"
+	"errors"
 	"math"
+)
+
+var (
+	ErrInvalidByte          = errors.New("invalid byte")
+	ErrUnterminatedSequence = errors.New("unterminated sequence")
 )
 
 func round(x float64) int {
@@ -36,10 +41,10 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 			u += (uint(b) - 95) << shift
 			shift += 5
 		default:
-			return 0, nil, fmt.Errorf("invalid byte %#v", b)
+			return 0, nil, ErrInvalidByte
 		}
 	}
-	return 0, nil, fmt.Errorf("unterminated sequence %#v", buf)
+	return 0, nil, ErrUnterminatedSequence
 }
 
 // DecodeInt decodes a single signed integer from buf.

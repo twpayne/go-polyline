@@ -45,6 +45,21 @@ func TestUint(t *testing.T) {
 	}
 }
 
+func TestDecodeUintErrors(t *testing.T) {
+	for _, tc := range []struct {
+		s   string
+		err error
+	}{
+		{s: ">", err: ErrInvalidByte},
+		{s: "\x80", err: ErrInvalidByte},
+		{s: "_", err: ErrUnterminatedSequence},
+	} {
+		if _, _, err := DecodeUint([]byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeUint([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+	}
+}
+
 func TestInt(t *testing.T) {
 	for _, tc := range []struct {
 		i int
