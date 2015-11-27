@@ -2,8 +2,11 @@ package polyline
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 	"reflect"
 	"testing"
+	"testing/quick"
 )
 
 func ExampleEncodeCoords() {
@@ -125,5 +128,43 @@ func TestCodec(t *testing.T) {
 		if got := tc.c.EncodeCoords(tc.cs, nil); string(got) != tc.s {
 			t.Errorf("%v.EncodeCoords(%v) = %v, want %v", tc.c, tc.cs, string(got), tc.s)
 		}
+	}
+}
+
+type QuickCoords [][]float64
+
+func (qc QuickCoords) Generate(rand *rand.Rand, size int) reflect.Value {
+	result := make([][]float64, size)
+	for i := range result {
+		result[i] = []float64{180*rand.Float64() - 90, 360*rand.Float64() - 180}
+	}
+	return reflect.ValueOf(result)
+}
+
+func TestCoordsQuick(t *testing.T) {
+	f := func(qc QuickCoords) bool {
+		buf := EncodeCoords([][]float64(qc), nil)
+		cs, buf, err := DecodeCoords(buf)
+		if len(buf) != 0 || err != nil {
+			return false
+		}
+		if len(cs) != len(qc) {
+			return false
+		}
+		for i, c := range cs {
+			if len(c) != len(qc[i]) {
+				return false
+			}
+			for j, x := range c {
+				// FIXME the tolerance should be 2e-6
+				if math.Abs(x-qc[i][j]) > 1e-4 {
+					return false
+				}
+			}
+		}
+		return true
+	}
+	if err := quick.Check(f, nil); err != nil {
+		t.Error(err)
 	}
 }
