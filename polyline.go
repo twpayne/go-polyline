@@ -8,11 +8,11 @@ import (
 	"math"
 )
 
-func round(x float64) float64 {
+func round(x float64) int {
 	if x < 0 {
-		return -math.Floor(-x + 0.5)
+		return int(-math.Floor(-x + 0.5))
 	} else {
-		return math.Floor(x + 0.5)
+		return int(math.Floor(x + 0.5))
 	}
 }
 
@@ -123,7 +123,7 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 // EncodeCoord encodes a single coordinate to buf.
 func (c Codec) EncodeCoord(coord []float64, buf []byte) []byte {
 	for _, x := range coord {
-		buf = EncodeInt(int(round(c.Scale*x)), buf)
+		buf = EncodeInt(round(c.Scale*x), buf)
 	}
 	return buf
 }
@@ -133,7 +133,7 @@ func (c Codec) EncodeCoords(coords [][]float64, buf []byte) []byte {
 	last := make([]int, c.Dim)
 	for _, coord := range coords {
 		for i, x := range coord {
-			ex := int(round(c.Scale * x))
+			ex := round(c.Scale * x)
 			buf = EncodeInt(ex-last[i], buf)
 			last[i] = ex
 		}
