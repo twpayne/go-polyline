@@ -16,6 +16,13 @@ func ExampleEncodeCoords() {
 	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 
+func ExampleDecodeCoords() {
+	buf := []byte("_p~iF~ps|U_ulLnnqC_mqNvxq`@")
+	coords, _, _ := DecodeCoords(buf)
+	fmt.Printf("%v\n", coords)
+	// Output: [[38.5 -120.2] [40.7 -120.95] [43.252 -126.453]]
+}
+
 func TestUint(t *testing.T) {
 	for _, c := range []struct {
 		u uint
