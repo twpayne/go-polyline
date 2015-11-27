@@ -76,18 +76,21 @@ func TestCoord(t *testing.T) {
 	}
 }
 
-func TestEncodeCoords(t *testing.T) {
+func TestCoords(t *testing.T) {
 	for _, c := range []struct {
-		coords [][]float64
-		want   string
+		cs [][]float64
+		s  string
 	}{
 		{
-			coords: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
-			want:   "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
+			cs: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
+			s:  "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 	} {
-		if got := EncodeCoords(c.coords, nil); string(got) != c.want {
-			t.Errorf("EncodeCoords(%v) = %v, want %v", c.coords, string(got), c.want)
+		if got, b, err := DecodeCoords([]byte(c.s)); !reflect.DeepEqual(got, c.cs) || len(b) != 0 || err != nil {
+			t.Errorf("DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", c.s, got, string(b), err, c.cs)
+		}
+		if got := EncodeCoords(c.cs, nil); string(got) != c.s {
+			t.Errorf("EncodeCoords(%v) = %v, want %v", c.cs, string(got), c.s)
 		}
 	}
 }

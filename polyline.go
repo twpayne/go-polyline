@@ -1,4 +1,4 @@
-// Package polyline implements a Google Maps Encoding Polyline encoder.
+// Package polyline implements a Google Maps Encoding Polyline encoder and decoder.
 //
 // See https://developers.google.com/maps/documentation/utilities/polylinealgorithm
 package polyline
@@ -98,6 +98,28 @@ func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return coord, buf, nil
 }
 
+// DecodeCoords decodes an array of coordinates from buf.
+func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
+	var coord []float64
+	var err error
+	coord, buf, err = c.DecodeCoord(buf)
+	if err != nil {
+		return nil, nil, err
+	}
+	coords := [][]float64{coord}
+	for i := 1; len(buf) > 0; i++ {
+		coord, buf, err = c.DecodeCoord(buf)
+		if err != nil {
+			return nil, nil, err
+		}
+		for j := range coord {
+			coord[j] += coords[i-1][j]
+		}
+		coords = append(coords, coord)
+	}
+	return coords, nil, nil
+}
+
 // EncodeCoord encodes a single coordinate to buf.
 func (c Codec) EncodeCoord(coord []float64, buf []byte) []byte {
 	for _, x := range coord {
@@ -126,6 +148,11 @@ func (c Codec) EncodeCoords(coords [][]float64, buf []byte) []byte {
 // DecodeCoord decodes a single coordinate from buf.
 func DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return defaultCodec.DecodeCoord(buf)
+}
+
+// DecodeCoords decodes an array of coordinates from buf.
+func DecodeCoords(buf []byte) ([][]float64, []byte, error) {
+	return defaultCodec.DecodeCoords(buf)
 }
 
 // EncodeFloat64 appends the encoding of a single float64 f to buf.
