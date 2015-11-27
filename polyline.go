@@ -92,9 +92,6 @@ func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 			return nil, nil, err
 		}
 		coord[i] = float64(j) / c.Scale
-		if err != nil {
-			return nil, nil, err
-		}
 	}
 	return coord, buf, nil
 }
