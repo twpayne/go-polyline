@@ -94,9 +94,35 @@ func TestCoords(t *testing.T) {
 		},
 	} {
 		if got, b, err := DecodeCoords([]byte(tc.s)); !reflect.DeepEqual(got, tc.cs) || len(b) != 0 || err != nil {
-			t.Errorf("DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, string(b), err, tc.cs)
+			t.Errorf("%v.DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.c, tc.s, got, string(b), err, tc.cs)
 		}
 		if got := EncodeCoords(tc.cs, nil); string(got) != tc.s {
+			t.Errorf("%v.EncodeCoords(%v) = %v, want %v", tc.c, tc.cs, string(got), tc.s)
+		}
+	}
+}
+
+func TestCodec(t *testing.T) {
+	for _, tc := range []struct {
+		c  Codec
+		cs [][]float64
+		s  string
+	}{
+		{
+			c:  Codec{Dim: 2, Scale: 1e5},
+			cs: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
+			s:  "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
+		},
+		{
+			c:  Codec{Dim: 2, Scale: 1e6},
+			cs: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
+			s:  "_izlhA~rlgdF_{geC~ywl@_kwzCn`{nI",
+		},
+	} {
+		if got, b, err := tc.c.DecodeCoords([]byte(tc.s)); !reflect.DeepEqual(got, tc.cs) || len(b) != 0 || err != nil {
+			t.Errorf("DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, string(b), err, tc.cs)
+		}
+		if got := tc.c.EncodeCoords(tc.cs, nil); string(got) != tc.s {
 			t.Errorf("EncodeCoords(%v) = %v, want %v", tc.cs, string(got), tc.s)
 		}
 	}
