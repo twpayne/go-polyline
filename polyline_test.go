@@ -167,10 +167,10 @@ func TestCodec(t *testing.T) {
 
 type QuickCoords [][]float64
 
-func (qc QuickCoords) Generate(rand *rand.Rand, size int) reflect.Value {
+func (qc QuickCoords) Generate(r *rand.Rand, size int) reflect.Value {
 	result := make([][]float64, size)
 	for i := range result {
-		result[i] = []float64{180*rand.Float64() - 90, 360*rand.Float64() - 180}
+		result[i] = []float64{180*r.Float64() - 90, 360*r.Float64() - 180}
 	}
 	return reflect.ValueOf(result)
 }
