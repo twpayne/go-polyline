@@ -13,7 +13,7 @@ func ExampleEncodeCoords() {
 		[]float64{40.7, -120.95},
 		[]float64{43.252, -126.453},
 	}
-	fmt.Printf("%s\n", EncodeCoords(nil, coords))
+	fmt.Printf("%s\n", EncodeCoords(coords))
 	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 ```

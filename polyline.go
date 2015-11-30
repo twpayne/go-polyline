@@ -189,12 +189,12 @@ func DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 	return defaultCodec.DecodeCoords(buf)
 }
 
-// EncodeCoord appends the encoding of an array of coordinates coords to buf.
-func EncodeCoord(buf []byte, coord []float64) []byte {
-	return defaultCodec.EncodeCoord(buf, coord)
+// EncodeCoord returns the encoding of an array of coordinates.
+func EncodeCoord(coord []float64) []byte {
+	return defaultCodec.EncodeCoord(nil, coord)
 }
 
-// EncodeCoords appends the encoding of an array of coordinates coords to buf.
-func EncodeCoords(buf []byte, coords [][]float64) []byte {
-	return defaultCodec.EncodeCoords(buf, coords)
+// EncodeCoords returns the encoding of an array of coordinates.
+func EncodeCoords(coords [][]float64) []byte {
+	return defaultCodec.EncodeCoords(nil, coords)
 }

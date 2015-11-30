@@ -15,7 +15,7 @@ func ExampleEncodeCoords() {
 		[]float64{40.7, -120.95},
 		[]float64{43.252, -126.453},
 	}
-	fmt.Printf("%s\n", EncodeCoords(nil, coords))
+	fmt.Printf("%s\n", EncodeCoords(coords))
 	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 
@@ -95,7 +95,7 @@ func TestCoord(t *testing.T) {
 		if got, b, err := DecodeCoord([]byte(tc.s)); !reflect.DeepEqual(got, tc.c) || len(b) != 0 || err != nil {
 			t.Errorf("DecodeCoord(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, err, string(b), tc.c)
 		}
-		if got := EncodeCoord(nil, tc.c); string(got) != tc.s {
+		if got := EncodeCoord(tc.c); string(got) != tc.s {
 			t.Errorf("EncodeCoord(%v, nil) = %v, want %v", tc.c, got, string(got), tc.s)
 		}
 	}
@@ -114,7 +114,7 @@ func TestCoords(t *testing.T) {
 		if got, b, err := DecodeCoords([]byte(tc.s)); !reflect.DeepEqual(got, tc.cs) || len(b) != 0 || err != nil {
 			t.Errorf("DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, string(b), err, tc.cs)
 		}
-		if got := EncodeCoords(nil, tc.cs); string(got) != tc.s {
+		if got := EncodeCoords(tc.cs); string(got) != tc.s {
 			t.Errorf("EncodeCoords(%v) = %v, want %v", tc.cs, string(got), tc.s)
 		}
 	}
@@ -177,7 +177,7 @@ func (qc QuickCoords) Generate(rand *rand.Rand, size int) reflect.Value {
 
 func TestCoordsQuick(t *testing.T) {
 	f := func(qc QuickCoords) bool {
-		buf := EncodeCoords(nil, [][]float64(qc))
+		buf := EncodeCoords([][]float64(qc))
 		cs, buf, err := DecodeCoords(buf)
 		if len(buf) != 0 || err != nil {
 			return false
