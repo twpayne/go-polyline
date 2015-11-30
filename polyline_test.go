@@ -165,6 +165,18 @@ func TestCodec(t *testing.T) {
 	}
 }
 
+func float64ArrayWithin(a, b []float64, prec float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, xa := range a {
+		if math.Abs(xa-b[i]) > prec {
+			return false
+		}
+	}
+	return true
+}
+
 type QuickCoords [][]float64
 
 func (qc QuickCoords) Generate(r *rand.Rand, size int) reflect.Value {
@@ -186,13 +198,8 @@ func TestCoordsQuick(t *testing.T) {
 			return false
 		}
 		for i, c := range cs {
-			if len(c) != len(qc[i]) {
+			if !float64ArrayWithin(c, qc[i], 5e-6) {
 				return false
-			}
-			for j, x := range c {
-				if math.Abs(x-qc[i][j]) > 5e-6 {
-					return false
-				}
 			}
 		}
 		return true
