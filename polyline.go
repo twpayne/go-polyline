@@ -62,7 +62,7 @@ func DecodeInt(buf []byte) (int, []byte, error) {
 }
 
 // EncodeUint appends the encoding of a single unsigned integer u to buf.
-func EncodeUint(u uint, buf []byte) []byte {
+func EncodeUint(buf []byte, u uint) []byte {
 	for u >= 32 {
 		buf = append(buf, byte((u&31)+95))
 		u = u >> 5
@@ -72,14 +72,14 @@ func EncodeUint(u uint, buf []byte) []byte {
 }
 
 // EncodeInt appends the encoding of a single signed integer i to buf.
-func EncodeInt(i int, buf []byte) []byte {
+func EncodeInt(buf []byte, i int) []byte {
 	var u uint
 	if i < 0 {
 		u = uint(^(i << 1))
 	} else {
 		u = uint(i << 1)
 	}
-	return EncodeUint(u, buf)
+	return EncodeUint(buf, u)
 }
 
 // DecodeCoord decodes a single coordinate from buf.
@@ -145,20 +145,20 @@ func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, e
 }
 
 // EncodeCoord encodes a single coordinate to buf.
-func (c Codec) EncodeCoord(coord []float64, buf []byte) []byte {
+func (c Codec) EncodeCoord(buf []byte, coord []float64) []byte {
 	for _, x := range coord {
-		buf = EncodeInt(round(c.Scale*x), buf)
+		buf = EncodeInt(buf, round(c.Scale*x))
 	}
 	return buf
 }
 
 // EncodeCoords appends the encoding of an array of coordinates coords to buf.
-func (c Codec) EncodeCoords(coords [][]float64, buf []byte) []byte {
+func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 	last := make([]int, c.Dim)
 	for _, coord := range coords {
 		for i, x := range coord {
 			ex := round(c.Scale * x)
-			buf = EncodeInt(ex-last[i], buf)
+			buf = EncodeInt(buf, ex-last[i])
 			last[i] = ex
 		}
 	}
@@ -173,7 +173,7 @@ func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	last := make([]int, c.Dim)
 	for i, x := range fcs {
 		ex := round(c.Scale * x)
-		buf = EncodeInt(ex-last[i%c.Dim], buf)
+		buf = EncodeInt(buf, ex-last[i%c.Dim])
 		last[i%c.Dim] = ex
 	}
 	return buf, nil
@@ -190,11 +190,11 @@ func DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 }
 
 // EncodeCoord appends the encoding of an array of coordinates coords to buf.
-func EncodeCoord(coord []float64, buf []byte) []byte {
-	return defaultCodec.EncodeCoord(coord, buf)
+func EncodeCoord(buf []byte, coord []float64) []byte {
+	return defaultCodec.EncodeCoord(buf, coord)
 }
 
 // EncodeCoords appends the encoding of an array of coordinates coords to buf.
-func EncodeCoords(coords [][]float64, buf []byte) []byte {
-	return defaultCodec.EncodeCoords(coords, buf)
+func EncodeCoords(buf []byte, coords [][]float64) []byte {
+	return defaultCodec.EncodeCoords(buf, coords)
 }
