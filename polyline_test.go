@@ -208,3 +208,34 @@ func TestCoordsQuick(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+type QuickFlatCoords []float64
+
+func (qfc QuickFlatCoords) Generate(r *rand.Rand, size int) reflect.Value {
+	result := make([]float64, 2*size)
+	for i := range result {
+		if i%2 == 0 {
+			result[i] = 180*r.Float64() - 90
+		} else {
+			result[i] = 360*r.Float64() - 180
+		}
+	}
+	return reflect.ValueOf(result)
+}
+
+func TestFlatCoordsQuick(t *testing.T) {
+	f := func(fqc QuickFlatCoords) bool {
+		buf, err := defaultCodec.EncodeFlatCoords(nil, []float64(fqc))
+		if err != nil {
+			return false
+		}
+		fcs, buf, err := defaultCodec.DecodeFlatCoords(nil, buf)
+		if err != nil {
+			return false
+		}
+		return float64ArrayWithin([]float64(fqc), fcs, 5e-6)
+	}
+	if err := quick.Check(f, nil); err != nil {
+		t.Error(err)
+	}
+}
