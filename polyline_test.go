@@ -96,7 +96,7 @@ func TestCoord(t *testing.T) {
 			t.Errorf("DecodeCoord(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, err, string(b), tc.c)
 		}
 		if got := EncodeCoord(tc.c); string(got) != tc.s {
-			t.Errorf("EncodeCoord(%v, nil) = %v, want %v", tc.c, got, string(got), tc.s)
+			t.Errorf("EncodeCoord(%v) = %v, want %v", tc.c, string(got), tc.s)
 		}
 	}
 }
