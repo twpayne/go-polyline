@@ -50,9 +50,9 @@ func TestDecodeUintErrors(t *testing.T) {
 		s   string
 		err error
 	}{
-		{s: ">", err: ErrInvalidByte},
-		{s: "\x80", err: ErrInvalidByte},
-		{s: "_", err: ErrUnterminatedSequence},
+		{s: ">", err: errInvalidByte},
+		{s: "\x80", err: errInvalidByte},
+		{s: "_", err: errUnterminatedSequence},
 	} {
 		if _, _, err := DecodeUint([]byte(tc.s)); err == nil || err != tc.err {
 			t.Errorf("DecodeUint([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)

@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	ErrDimensionalMismatch  = errors.New("dimensional mismatch")
-	ErrInvalidByte          = errors.New("invalid byte")
-	ErrUnterminatedSequence = errors.New("unterminated sequence")
+	errDimensionalMismatch  = errors.New("dimensional mismatch")
+	errInvalidByte          = errors.New("invalid byte")
+	errUnterminatedSequence = errors.New("unterminated sequence")
 )
 
 func round(x float64) int {
@@ -121,7 +121,7 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 // one-dimensional array.
 func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, error) {
 	if len(fcs)%c.Dim != 0 {
-		return nil, nil, ErrDimensionalMismatch
+		return nil, nil, errDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
 	for len(buf) > 0 {
@@ -137,7 +137,7 @@ func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, e
 		}
 	}
 	if len(fcs)%c.Dim != 0 {
-		return nil, nil, ErrDimensionalMismatch
+		return nil, nil, errDimensionalMismatch
 	}
 	return fcs, nil, nil
 }
@@ -166,7 +166,7 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 // EncodeFlatCoords encodes a one-dimensional array of coordinates to buf.
 func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	if len(fcs)%c.Dim != 0 {
-		return nil, ErrDimensionalMismatch
+		return nil, errDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
 	for i, x := range fcs {
