@@ -17,9 +17,8 @@ var (
 func round(x float64) int {
 	if x < 0 {
 		return int(-math.Floor(-x + 0.5))
-	} else {
-		return int(math.Floor(x + 0.5))
 	}
+	return int(math.Floor(x + 0.5))
 }
 
 // A Codec represents an encoder.
@@ -42,10 +41,10 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 			u += (uint(b) - 95) << shift
 			shift += 5
 		default:
-			return 0, nil, ErrInvalidByte
+			return 0, nil, errInvalidByte
 		}
 	}
-	return 0, nil, ErrUnterminatedSequence
+	return 0, nil, errUnterminatedSequence
 }
 
 // DecodeInt decodes a single signed integer from buf.
@@ -56,9 +55,8 @@ func DecodeInt(buf []byte) (int, []byte, error) {
 	}
 	if u&1 == 0 {
 		return int(u >> 1), buf, nil
-	} else {
-		return -int((u + 1) >> 1), buf, nil
 	}
+	return -int((u + 1) >> 1), buf, nil
 }
 
 // EncodeUint appends the encoding of a single unsigned integer u to buf.
