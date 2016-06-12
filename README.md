@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/twpayne/go-polyline.svg?branch=master)](https://travis-ci.org/twpayne/go-polyline)
 [![GoDoc](https://godoc.org/github.com/twpayne/go-polyline?status.svg)](https://godoc.org/github.com/twpayne/go-polyline)
+[![Report Card](https://goreportcard.com/badge/github.com/twpayne/go-polyline)](https://goreportcard.com/report/github.com/twpayne/go-polyline)
 
 Package polyline implements a Google Maps Encoding Polyline encoder and decoder.
 
