@@ -229,7 +229,7 @@ func TestFlatCoordsQuick(t *testing.T) {
 		if err != nil {
 			return false
 		}
-		fcs, buf, err := defaultCodec.DecodeFlatCoords(nil, buf)
+		fcs, _, err := defaultCodec.DecodeFlatCoords(nil, buf)
 		if err != nil {
 			return false
 		}
