@@ -73,6 +73,25 @@ func TestDecodeErrors(t *testing.T) {
 	}
 }
 
+func TestMultidimensionalDecodeErrors(t *testing.T) {
+	for _, tc := range []struct {
+		s   string
+		err error
+	}{
+		{s: "_p~iF~ps|U_p~iF>", err: errInvalidByte},
+		{s: "_p~iF~ps|U_p~iF\x80", err: errInvalidByte},
+		{s: "_p~iF~ps|U_p~iF~ps|", err: errUnterminatedSequence},
+	} {
+		if _, _, err := DecodeCoords([]byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+		c := Codec{Dim: 2, Scale: 1e5}
+		if _, _, err := c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeFlatCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+	}
+}
+
 func TestInt(t *testing.T) {
 	for _, tc := range []struct {
 		i int
