@@ -45,7 +45,7 @@ func TestUint(t *testing.T) {
 	}
 }
 
-func TestDecodeUintErrors(t *testing.T) {
+func TestDecodeErrors(t *testing.T) {
 	for _, tc := range []struct {
 		s   string
 		err error
@@ -56,6 +56,19 @@ func TestDecodeUintErrors(t *testing.T) {
 	} {
 		if _, _, err := DecodeUint([]byte(tc.s)); err == nil || err != tc.err {
 			t.Errorf("DecodeUint([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+		if _, _, err := DecodeInt([]byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeInt([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+		if _, _, err := DecodeCoord([]byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeCoord([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+		if _, _, err := DecodeCoords([]byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
+		}
+		c := Codec{Dim: 1, Scale: 1e5}
+		if _, _, err := c.DecodeFlatCoords([]float64{0}, []byte(tc.s)); err == nil || err != tc.err {
+			t.Errorf("DecodeFlatCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
 		}
 	}
 }
