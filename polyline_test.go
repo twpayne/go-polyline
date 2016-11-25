@@ -171,6 +171,34 @@ func TestFlatCoords(t *testing.T) {
 	}
 }
 
+func TestFlatCoordsErrors(t *testing.T) {
+	for _, tc := range []struct {
+		fcs []float64
+		s   string
+		err error
+	}{
+		{
+			fcs: []float64{0},
+			s:   "",
+			err: errDimensionalMismatch,
+		},
+		{
+			fcs: []float64{0},
+			s:   "_p~iF~ps|U",
+			err: errDimensionalMismatch,
+		},
+		{
+			fcs: []float64{},
+			s:   "_p~iF~ps|U_p~iF",
+			err: errUnterminatedSequence,
+		},
+	} {
+		if _, _, err := defaultCodec.DecodeFlatCoords(tc.fcs, []byte(tc.s)); err != tc.err {
+			t.Errorf("defaultCodec.DecodeFlatCoords(%v, %v) == _, %v, want _, %v", tc.fcs, tc.s, err, tc.err)
+		}
+	}
+}
+
 func TestCodec(t *testing.T) {
 	for _, tc := range []struct {
 		c  Codec
