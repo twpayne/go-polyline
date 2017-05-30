@@ -1,6 +1,9 @@
 // Package polyline implements a Google Maps Encoding Polyline encoder and decoder.
 //
 // See https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+//
+// The default codec encodes and decodes two-dimensional coordinates scaled by
+// 1e5. For other dimensionalities and scales create a custom Codec.
 package polyline
 
 import (
@@ -177,22 +180,25 @@ func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	return buf, nil
 }
 
-// DecodeCoord decodes a single coordinate from buf.
+// DecodeCoord decodes a single coordinate from buf using the default codec.
 func DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return defaultCodec.DecodeCoord(buf)
 }
 
-// DecodeCoords decodes an array of coordinates from buf.
+// DecodeCoords decodes an array of coordinates from buf using the default
+// codec.
 func DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 	return defaultCodec.DecodeCoords(buf)
 }
 
-// EncodeCoord returns the encoding of an array of coordinates.
+// EncodeCoord returns the encoding of an array of coordinates using the
+// default codec.
 func EncodeCoord(coord []float64) []byte {
 	return defaultCodec.EncodeCoord(nil, coord)
 }
 
-// EncodeCoords returns the encoding of an array of coordinates.
+// EncodeCoords returns the encoding of an array of coordinates using the
+// default codec.
 func EncodeCoords(coords [][]float64) []byte {
 	return defaultCodec.EncodeCoords(nil, coords)
 }
