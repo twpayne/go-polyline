@@ -32,7 +32,8 @@ type Codec struct {
 
 var defaultCodec = Codec{Dim: 2, Scale: 1e5}
 
-// DecodeUint decodes a single unsigned integer from buf.
+// DecodeUint decodes a single unsigned integer from buf. It returns the
+// decoded uint, the remaining unconsumed bytes of buf, and any error.
 func DecodeUint(buf []byte) (uint, []byte, error) {
 	var u, shift uint
 	for i, b := range buf {
@@ -50,7 +51,8 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 	return 0, nil, errUnterminatedSequence
 }
 
-// DecodeInt decodes a single signed integer from buf.
+// DecodeInt decodes a single signed integer from buf. It returns the decoded
+// int, the remaining unconsumed bytes of buf, and any error.
 func DecodeInt(buf []byte) (int, []byte, error) {
 	u, buf, err := DecodeUint(buf)
 	if err != nil {
@@ -83,7 +85,8 @@ func EncodeInt(buf []byte, i int) []byte {
 	return EncodeUint(buf, u)
 }
 
-// DecodeCoord decodes a single coordinate from buf.
+// DecodeCoord decodes a single coordinate from buf. It returns the coordinate,
+// the remaining unconsumed bytes of buf, and any error.
 func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	coord := make([]float64, c.Dim)
 	for i := range coord {
@@ -98,7 +101,8 @@ func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return coord, buf, nil
 }
 
-// DecodeCoords decodes an array of coordinates from buf.
+// DecodeCoords decodes an array of coordinates from buf. It returns the
+// coordinates, the remaining unconsumed bytes of buf, and any error.
 func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 	var coord []float64
 	var err error
@@ -121,7 +125,8 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 }
 
 // DecodeFlatCoords decodes coordinates from buf, appending them to a
-// one-dimensional array.
+// one-dimensional array. It returns the coordinates, the remaining unconsumed
+// bytes in buf, and any error.
 func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, error) {
 	if len(fcs)%c.Dim != 0 {
 		return nil, nil, errDimensionalMismatch
