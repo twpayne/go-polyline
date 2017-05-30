@@ -144,9 +144,6 @@ func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, e
 			fcs = append(fcs, float64(last[j])/c.Scale)
 		}
 	}
-	if len(fcs)%c.Dim != 0 {
-		return nil, nil, errDimensionalMismatch
-	}
 	return fcs, nil, nil
 }
 
