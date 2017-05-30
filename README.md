@@ -11,9 +11,9 @@ Encoding example:
 ```go
 func ExampleEncodeCoords() {
 	var coords = [][]float64{
-		[]float64{38.5, -120.2},
-		[]float64{40.7, -120.95},
-		[]float64{43.252, -126.453},
+		{38.5, -120.2},
+		{40.7, -120.95},
+		{43.252, -126.453},
 	}
 	fmt.Printf("%s\n", EncodeCoords(coords))
 	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
