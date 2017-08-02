@@ -201,7 +201,6 @@ func TestDecodeFlatCoordsErrors(t *testing.T) {
 
 func TestEncodeFlatCoordErrors(t *testing.T) {
 	for _, tc := range []struct {
-		c   Codec
 		fcs []float64
 		err error
 	}{
