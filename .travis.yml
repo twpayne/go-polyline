@@ -1,13 +1,24 @@
 language: go
 
+go:
+  - master
+  - 1.11.x
+  - 1.10.x
+  - 1.9.x
+  - 1.8.x
+
+env:
+  - GO111MODULE=on
+
 install:
-        - go get github.com/golang/lint/golint
+  - go get github.com/golang/lint/golint
 
 script:
-        - go test -v ./...
-        - go test -cover -race ./...
-        - go vet ./...
-        - test -z "$(gofmt -d -s *.go)"
-        - golint ./...
+  - go build ./...
+  - go test -v ./...
+  - go test -cover -race ./...
+  - go vet ./...
+  - test -z "$(gofmt -d -s *.go)"
+  - golint ./...
 
 sudo: false
