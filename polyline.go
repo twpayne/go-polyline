@@ -30,6 +30,7 @@ type Codec struct {
 	Scale float64 // Scale, normally 1e5
 }
 
+//nolint:gochecknoglobals
 var defaultCodec = Codec{Dim: 2, Scale: 1e5}
 
 // DecodeUint decodes a single unsigned integer from buf. It returns the
@@ -68,7 +69,7 @@ func DecodeInt(buf []byte) (int, []byte, error) {
 func EncodeUint(buf []byte, u uint) []byte {
 	for u >= 32 {
 		buf = append(buf, byte((u&31)+95))
-		u = u >> 5
+		u >>= 5
 	}
 	buf = append(buf, byte(u+63))
 	return buf
