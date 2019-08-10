@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"testing"
 	"testing/quick"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func ExampleEncodeCoords() {
@@ -36,12 +38,11 @@ func TestUint(t *testing.T) {
 		{u: 32, s: "_@"},
 		{u: 174, s: "mD"},
 	} {
-		if got, b, err := DecodeUint([]byte(tc.s)); got != tc.u || len(b) != 0 || err != nil {
-			t.Errorf("DecodeUint(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, err, string(b), tc.u)
-		}
-		if got := EncodeUint(nil, tc.u); string(got) != tc.s {
-			t.Errorf("EncodeUint(%v) = %v, want %v", tc.u, string(got), tc.s)
-		}
+		got, b, err := DecodeUint([]byte(tc.s))
+		assert.NoError(t, err)
+		assert.Equal(t, tc.u, got)
+		assert.Empty(t, b)
+		assert.Equal(t, []byte(tc.s), EncodeUint(nil, tc.u))
 	}
 }
 
@@ -54,22 +55,18 @@ func TestDecodeErrors(t *testing.T) {
 		{s: "\x80", err: errInvalidByte},
 		{s: "_", err: errUnterminatedSequence},
 	} {
-		if _, _, err := DecodeUint([]byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeUint([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
-		if _, _, err := DecodeInt([]byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeInt([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
-		if _, _, err := DecodeCoord([]byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeCoord([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
-		if _, _, err := DecodeCoords([]byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
+		var err error
+		_, _, err = DecodeUint([]byte(tc.s))
+		assert.Equal(t, tc.err, err)
+		_, _, err = DecodeInt([]byte(tc.s))
+		assert.Equal(t, tc.err, err)
+		_, _, err = DecodeCoord([]byte(tc.s))
+		assert.Equal(t, tc.err, err)
+		_, _, err = DecodeCoords([]byte(tc.s))
+		assert.Equal(t, tc.err, err)
 		c := Codec{Dim: 1, Scale: 1e5}
-		if _, _, err := c.DecodeFlatCoords([]float64{0}, []byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeFlatCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
+		_, _, err = c.DecodeFlatCoords([]float64{0}, []byte(tc.s))
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -82,13 +79,11 @@ func TestMultidimensionalDecodeErrors(t *testing.T) {
 		{s: "_p~iF~ps|U_p~iF\x80", err: errInvalidByte},
 		{s: "_p~iF~ps|U_p~iF~ps|", err: errUnterminatedSequence},
 	} {
-		if _, _, err := DecodeCoords([]byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
+		_, _, err := DecodeCoords([]byte(tc.s))
+		assert.Equal(t, tc.err, err)
 		c := Codec{Dim: 2, Scale: 1e5}
-		if _, _, err := c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s)); err == nil || err != tc.err {
-			t.Errorf("DecodeFlatCoords([]byte(%v)) == _, _, %v, want %v", tc.s, err, tc.err)
-		}
+		_, _, err = c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s))
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -105,12 +100,11 @@ func TestInt(t *testing.T) {
 		{i: 255200, s: "_mqN"},
 		{i: -550300, s: "vxq`@"},
 	} {
-		if got, b, err := DecodeInt([]byte(tc.s)); got != tc.i || len(b) != 0 || err != nil {
-			t.Errorf("DecodeInt(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, err, string(b), tc.i)
-		}
-		if got := EncodeInt(nil, tc.i); string(got) != tc.s {
-			t.Errorf("EncodeInt(%v) = %v, want %v", tc.i, string(got), tc.s)
-		}
+		got, b, err := DecodeInt([]byte(tc.s))
+		assert.NoError(t, err)
+		assert.Empty(t, b)
+		assert.Equal(t, tc.i, got)
+		assert.Equal(t, []byte(tc.s), EncodeInt(nil, tc.i))
 	}
 }
 
@@ -124,12 +118,11 @@ func TestCoord(t *testing.T) {
 			c: []float64{38.5, -120.2},
 		},
 	} {
-		if got, b, err := DecodeCoord([]byte(tc.s)); !reflect.DeepEqual(got, tc.c) || len(b) != 0 || err != nil {
-			t.Errorf("DecodeCoord(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, err, string(b), tc.c)
-		}
-		if got := EncodeCoord(tc.c); string(got) != tc.s {
-			t.Errorf("EncodeCoord(%v) = %v, want %v", tc.c, string(got), tc.s)
-		}
+		got, b, err := DecodeCoord([]byte(tc.s))
+		assert.NoError(t, err)
+		assert.Empty(t, b)
+		assert.Equal(t, tc.c, got)
+		assert.Equal(t, []byte(tc.s), EncodeCoord(tc.c))
 	}
 }
 
@@ -143,12 +136,11 @@ func TestCoords(t *testing.T) {
 			s:  "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 	} {
-		if got, b, err := DecodeCoords([]byte(tc.s)); !reflect.DeepEqual(got, tc.cs) || len(b) != 0 || err != nil {
-			t.Errorf("DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.s, got, string(b), err, tc.cs)
-		}
-		if got := EncodeCoords(tc.cs); string(got) != tc.s {
-			t.Errorf("EncodeCoords(%v) = %v, want %v", tc.cs, string(got), tc.s)
-		}
+		got, b, err := DecodeCoords([]byte(tc.s))
+		assert.NoError(t, err)
+		assert.Empty(t, b)
+		assert.Equal(t, tc.cs, got)
+		assert.Equal(t, []byte(tc.s), EncodeCoords(tc.cs))
 	}
 }
 
@@ -162,12 +154,13 @@ func TestFlatCoords(t *testing.T) {
 			s:   "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 	} {
-		if got, b, err := defaultCodec.DecodeFlatCoords(nil, []byte(tc.s)); !reflect.DeepEqual(got, tc.fcs) || len(b) != 0 || err != nil {
-			t.Errorf("defaultCodec.DecodeFlatCoords(nil, %#v) = %v, %v, %v, want %v, nil, nil", tc.s, got, string(b), err, tc.fcs)
-		}
-		if got, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs); string(got) != tc.s || err != nil {
-			t.Errorf("defaultCodec.EncodeFlatCoords(nil, %v) = %v, %v, want %v, nil", tc.fcs, string(got), err, tc.s)
-		}
+		gotFCS, b, err := defaultCodec.DecodeFlatCoords(nil, []byte(tc.s))
+		assert.NoError(t, err)
+		assert.Empty(t, b)
+		assert.Equal(t, tc.fcs, gotFCS)
+		gotBytes, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs)
+		assert.NoError(t, err)
+		assert.Equal(t, []byte(tc.s), gotBytes)
 	}
 }
 
@@ -193,9 +186,8 @@ func TestDecodeFlatCoordsErrors(t *testing.T) {
 			err: errUnterminatedSequence,
 		},
 	} {
-		if _, _, err := defaultCodec.DecodeFlatCoords(tc.fcs, []byte(tc.s)); err != tc.err {
-			t.Errorf("defaultCodec.DecodeFlatCoords(%v, %v) == _, %v, want _, %v", tc.fcs, tc.s, err, tc.err)
-		}
+		_, _, err := defaultCodec.DecodeFlatCoords(tc.fcs, []byte(tc.s))
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -209,9 +201,8 @@ func TestEncodeFlatCoordErrors(t *testing.T) {
 			err: errDimensionalMismatch,
 		},
 	} {
-		if _, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs); err != tc.err {
-			t.Errorf("defaultCodec.EncodeFlatCoords(nil, %v) == _, %v, want _, %v", tc.fcs, err, tc.err)
-		}
+		_, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs)
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -232,12 +223,11 @@ func TestCodec(t *testing.T) {
 			s:  "_izlhA~rlgdF_{geC~ywl@_kwzCn`{nI",
 		},
 	} {
-		if got, b, err := tc.c.DecodeCoords([]byte(tc.s)); !reflect.DeepEqual(got, tc.cs) || len(b) != 0 || err != nil {
-			t.Errorf("%v.DecodeCoords(%v) = %v, %v, %v, want %v, nil, nil", tc.c, tc.s, got, string(b), err, tc.cs)
-		}
-		if got := tc.c.EncodeCoords(nil, tc.cs); string(got) != tc.s {
-			t.Errorf("%v.EncodeCoords(%v) = %v, want %v", tc.c, tc.cs, string(got), tc.s)
-		}
+		got, b, err := tc.c.DecodeCoords([]byte(tc.s))
+		assert.NoError(t, err)
+		assert.Equal(t, tc.cs, got)
+		assert.Empty(t, b)
+		assert.Equal(t, []byte(tc.s), tc.c.EncodeCoords(nil, tc.cs))
 	}
 }
 
@@ -280,9 +270,7 @@ func TestCoordsQuick(t *testing.T) {
 		}
 		return true
 	}
-	if err := quick.Check(f, nil); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, quick.Check(f, nil))
 }
 
 type QuickFlatCoords []float64
@@ -311,7 +299,5 @@ func TestFlatCoordsQuick(t *testing.T) {
 		}
 		return float64ArrayWithin([]float64(fqc), fcs, 5e-6)
 	}
-	if err := quick.Check(f, nil); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, quick.Check(f, nil))
 }
