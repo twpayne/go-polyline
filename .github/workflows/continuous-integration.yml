@@ -2,7 +2,7 @@ on:
   pull_request:
     types:
     - opened
-    - synchronized
+    - synchronize
     - reopened
   push:
 name: continuous-integration
