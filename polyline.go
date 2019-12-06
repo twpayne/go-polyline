@@ -1,9 +1,17 @@
-// Package polyline implements a Google Maps Encoding Polyline encoder and decoder.
-//
-// See https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+// Package polyline implements a Google Maps Encoding Polyline encoder and
+// decoder. See
+// https://developers.google.com/maps/documentation/utilities/polylinealgorithm.
 //
 // The default codec encodes and decodes two-dimensional coordinates scaled by
 // 1e5. For other dimensionalities and scales create a custom Codec.
+//
+// The package operates on byte slices. Encoding functions take an existing byte
+// slice as input (which can be nil) and return a new byte slice with the
+// encoded value appended to it, similarly to how Go's append function works. To
+// increase performance, you can pre-allocate byte slices, for example by
+// passing make([]byte, 0, 128) as the input byte slice. Similarly, decoding
+// functions take a byte slice as input and return the remaining unconsumed
+// bytes as output.
 package polyline
 
 import (
@@ -33,8 +41,8 @@ type Codec struct {
 //nolint:gochecknoglobals
 var defaultCodec = Codec{Dim: 2, Scale: 1e5}
 
-// DecodeUint decodes a single unsigned integer from buf. It returns the
-// decoded uint, the remaining unconsumed bytes of buf, and any error.
+// DecodeUint decodes a single unsigned integer from buf. It returns the decoded
+// uint, the remaining unconsumed bytes of buf, and any error.
 func DecodeUint(buf []byte) (uint, []byte, error) {
 	var u, shift uint
 	for i, b := range buf {
@@ -65,7 +73,8 @@ func DecodeInt(buf []byte) (int, []byte, error) {
 	return -int((u + 1) >> 1), buf, nil
 }
 
-// EncodeUint appends the encoding of a single unsigned integer u to buf.
+// EncodeUint appends the encoding of a single unsigned integer u to buf and
+// returns the new buf.
 func EncodeUint(buf []byte, u uint) []byte {
 	for u >= 32 {
 		buf = append(buf, byte((u&31)+95))
@@ -75,7 +84,8 @@ func EncodeUint(buf []byte, u uint) []byte {
 	return buf
 }
 
-// EncodeInt appends the encoding of a single signed integer i to buf.
+// EncodeInt appends the encoding of a single signed integer i to buf and
+// returns the new buf.
 func EncodeInt(buf []byte, i int) []byte {
 	var u uint
 	if i < 0 {
@@ -148,7 +158,7 @@ func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, e
 	return fcs, nil, nil
 }
 
-// EncodeCoord encodes a single coordinate to buf.
+// EncodeCoord encodes a single coordinate to buf and returns the new buf.
 func (c Codec) EncodeCoord(buf []byte, coord []float64) []byte {
 	for _, x := range coord {
 		buf = EncodeInt(buf, round(c.Scale*x))
@@ -156,7 +166,8 @@ func (c Codec) EncodeCoord(buf []byte, coord []float64) []byte {
 	return buf
 }
 
-// EncodeCoords appends the encoding of an array of coordinates coords to buf.
+// EncodeCoords appends the encoding of an array of coordinates coords to buf
+// and returns the new buf.
 func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 	last := make([]int, c.Dim)
 	for _, coord := range coords {
@@ -169,7 +180,8 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 	return buf
 }
 
-// EncodeFlatCoords encodes a one-dimensional array of coordinates to buf.
+// EncodeFlatCoords encodes a one-dimensional array of coordinates to buf. It
+// returns the new buf and any error.
 func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	if len(fcs)%c.Dim != 0 {
 		return nil, errDimensionalMismatch
@@ -183,19 +195,20 @@ func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	return buf, nil
 }
 
-// DecodeCoord decodes a single coordinate from buf using the default codec.
+// DecodeCoord decodes a single coordinate from buf using the default codec. It
+// returns the coordinate, the remaining bytes in buf, and any error.
 func DecodeCoord(buf []byte) ([]float64, []byte, error) {
 	return defaultCodec.DecodeCoord(buf)
 }
 
 // DecodeCoords decodes an array of coordinates from buf using the default
-// codec.
+// codec. It returns the coordinates, the remaining bytes in buf, and any error.
 func DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 	return defaultCodec.DecodeCoords(buf)
 }
 
-// EncodeCoord returns the encoding of an array of coordinates using the
-// default codec.
+// EncodeCoord returns the encoding of an array of coordinates using the default
+// codec.
 func EncodeCoord(coord []float64) []byte {
 	return defaultCodec.EncodeCoord(nil, coord)
 }
