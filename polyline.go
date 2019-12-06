@@ -189,8 +189,9 @@ func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
 	last := make([]int, c.Dim)
 	for i, x := range fcs {
 		ex := round(c.Scale * x)
-		buf = EncodeInt(buf, ex-last[i%c.Dim])
-		last[i%c.Dim] = ex
+		j := i % c.Dim
+		buf = EncodeInt(buf, ex-last[j])
+		last[j] = ex
 	}
 	return buf, nil
 }
