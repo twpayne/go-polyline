@@ -30,10 +30,13 @@ func ExampleDecodeCoords() {
 
 func TestUint(t *testing.T) {
 	for _, tc := range []struct {
-		u uint
-		s string
+		u            uint
+		s            string
+		nonCanonical bool
 	}{
 		{u: 0, s: "?"},
+		{u: 2, s: "a?", nonCanonical: true},
+		{u: 2, s: "A"},
 		{u: 31, s: "^"},
 		{u: 32, s: "_@"},
 		{u: 174, s: "mD"},
@@ -42,7 +45,9 @@ func TestUint(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, tc.u, got)
 		assert.Empty(t, b)
-		assert.Equal(t, []byte(tc.s), EncodeUint(nil, tc.u))
+		if !tc.nonCanonical {
+			assert.Equal(t, []byte(tc.s), EncodeUint(nil, tc.u))
+		}
 	}
 }
 
@@ -110,19 +115,27 @@ func TestInt(t *testing.T) {
 
 func TestCoord(t *testing.T) {
 	for _, tc := range []struct {
-		s string
-		c []float64
+		s            string
+		c            []float64
+		nonCanonical bool
 	}{
 		{
 			s: "_p~iF~ps|U",
 			c: []float64{38.5, -120.2},
+		},
+		{
+			s:            "a?Z",
+			c:            []float64{1e-05, -0.00014},
+			nonCanonical: true,
 		},
 	} {
 		got, b, err := DecodeCoord([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Empty(t, b)
 		assert.Equal(t, tc.c, got)
-		assert.Equal(t, []byte(tc.s), EncodeCoord(tc.c))
+		if !tc.nonCanonical {
+			assert.Equal(t, []byte(tc.s), EncodeCoord(tc.c))
+		}
 	}
 }
 
