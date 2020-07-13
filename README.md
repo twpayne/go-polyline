@@ -14,7 +14,7 @@ func ExampleEncodeCoords() {
         {40.7, -120.95},
         {43.252, -126.453},
     }
-    fmt.Printf("%s\n", EncodeCoords(coords))
+    fmt.Printf("%s\n", polyline.EncodeCoords(coords))
     // Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 ```
@@ -24,7 +24,7 @@ func ExampleEncodeCoords() {
 ```go
 func ExampleDecodeCoords() {
     buf := []byte("_p~iF~ps|U_ulLnnqC_mqNvxq`@")
-    coords, _, _ := DecodeCoords(buf)
+    coords, _, _ := polyline.DecodeCoords(buf)
     fmt.Printf("%v\n", coords)
     // Output: [[38.5 -120.2] [40.7 -120.95] [43.252 -126.453]]
 }
