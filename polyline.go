@@ -137,8 +137,8 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 // DecodeFlatCoords decodes coordinates from buf, appending them to a
 // one-dimensional array. It returns the coordinates, the remaining unconsumed
 // bytes in buf, and any error.
-func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, error) {
-	if len(fcs)%c.Dim != 0 {
+func (c Codec) DecodeFlatCoords(flatCoords []float64, buf []byte) ([]float64, []byte, error) {
+	if len(flatCoords)%c.Dim != 0 {
 		return nil, nil, errDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
@@ -151,10 +151,10 @@ func (c Codec) DecodeFlatCoords(fcs []float64, buf []byte) ([]float64, []byte, e
 				return nil, nil, err
 			}
 			last[j] += k
-			fcs = append(fcs, float64(last[j])/c.Scale)
+			flatCoords = append(flatCoords, float64(last[j])/c.Scale)
 		}
 	}
-	return fcs, nil, nil
+	return flatCoords, nil, nil
 }
 
 // EncodeCoord encodes a single coordinate to buf and returns the new buf.
@@ -181,12 +181,12 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 
 // EncodeFlatCoords encodes a one-dimensional array of coordinates to buf. It
 // returns the new buf and any error.
-func (c Codec) EncodeFlatCoords(buf []byte, fcs []float64) ([]byte, error) {
-	if len(fcs)%c.Dim != 0 {
+func (c Codec) EncodeFlatCoords(buf []byte, flatCoords []float64) ([]byte, error) {
+	if len(flatCoords)%c.Dim != 0 {
 		return nil, errDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
-	for i, x := range fcs {
+	for i, x := range flatCoords {
 		ex := round(c.Scale * x)
 		j := i % c.Dim
 		buf = EncodeInt(buf, ex-last[j])
