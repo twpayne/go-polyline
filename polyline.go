@@ -38,7 +38,6 @@ type Codec struct {
 	Scale float64 // Scale, normally 1e5
 }
 
-//nolint:gochecknoglobals
 var defaultCodec = Codec{Dim: 2, Scale: 1e5}
 
 // DecodeUint decodes a single unsigned integer from buf. It returns the decoded
