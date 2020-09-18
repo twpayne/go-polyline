@@ -9,13 +9,13 @@ Package `polyline` implements a Google Maps Encoding Polyline encoder and decode
 
 ```go
 func ExampleEncodeCoords() {
-    var coords = [][]float64{
-        {38.5, -120.2},
-        {40.7, -120.95},
-        {43.252, -126.453},
-    }
-    fmt.Printf("%s\n", polyline.EncodeCoords(coords))
-    // Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
+	coords := [][]float64{
+		{38.5, -120.2},
+		{40.7, -120.95},
+		{43.252, -126.453},
+	}
+	fmt.Println(string(EncodeCoords(coords)))
+	// Output: _p~iF~ps|U_ulLnnqC_mqNvxq`@
 }
 ```
 
@@ -23,10 +23,10 @@ func ExampleEncodeCoords() {
 
 ```go
 func ExampleDecodeCoords() {
-    buf := []byte("_p~iF~ps|U_ulLnnqC_mqNvxq`@")
-    coords, _, _ := polyline.DecodeCoords(buf)
-    fmt.Printf("%v\n", coords)
-    // Output: [[38.5 -120.2] [40.7 -120.95] [43.252 -126.453]]
+	buf := []byte("_p~iF~ps|U_ulLnnqC_mqNvxq`@")
+	coords, _, _ := DecodeCoords(buf)
+	fmt.Println(coords)
+	// Output: [[38.5 -120.2] [40.7 -120.95] [43.252 -126.453]]
 }
 ```
 
