@@ -1,6 +1,7 @@
-package polyline
+package polyline_test
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"reflect"
