@@ -46,6 +46,7 @@ linters:
   - nilerr
   - noctx
   - nolintlint
+  - paralleltest
   - prealloc
   - predeclared
   - promlinter
@@ -72,7 +73,6 @@ linters:
   - gomnd
   - lll
   - nlreturn
-  - paralleltest
   - wsl
 
 linters-settings:
