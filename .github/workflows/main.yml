@@ -27,11 +27,16 @@ jobs:
       run: go build ./...
     - name: Test
       run: go test -covermode=atomic -coverprofile=profile.cov -race ./...
-    - name: Lint
-      uses: golangci/golangci-lint-action@v1
-      with:
-        version: v1.28
     - name: Upload coverage
       uses: shogo82148/actions-goveralls@v1
       with:
         path-to-profile: profile.cov
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.42
