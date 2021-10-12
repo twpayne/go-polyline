@@ -19,10 +19,11 @@ import (
 	"math"
 )
 
+// Errors.
 var (
-	errDimensionalMismatch  = errors.New("dimensional mismatch")
-	errInvalidByte          = errors.New("invalid byte")
-	errUnterminatedSequence = errors.New("unterminated sequence")
+	ErrDimensionalMismatch  = errors.New("dimensional mismatch")
+	ErrInvalidByte          = errors.New("invalid byte")
+	ErrUnterminatedSequence = errors.New("unterminated sequence")
 )
 
 func round(x float64) int {
@@ -53,10 +54,10 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 			u += (uint(b) - 95) << shift
 			shift += 5
 		default:
-			return 0, nil, errInvalidByte
+			return 0, nil, ErrInvalidByte
 		}
 	}
-	return 0, nil, errUnterminatedSequence
+	return 0, nil, ErrUnterminatedSequence
 }
 
 // DecodeInt decodes a single signed integer from buf. It returns the decoded
@@ -139,7 +140,7 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 // bytes in buf, and any error.
 func (c Codec) DecodeFlatCoords(flatCoords []float64, buf []byte) ([]float64, []byte, error) {
 	if len(flatCoords)%c.Dim != 0 {
-		return nil, nil, errDimensionalMismatch
+		return nil, nil, ErrDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
 	for len(buf) > 0 {
@@ -183,7 +184,7 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 // returns the new buf and any error.
 func (c Codec) EncodeFlatCoords(buf []byte, flatCoords []float64) ([]byte, error) {
 	if len(flatCoords)%c.Dim != 0 {
-		return nil, errDimensionalMismatch
+		return nil, ErrDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
 	for i, x := range flatCoords {

@@ -1,6 +1,7 @@
-package polyline
+package polyline_test
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"reflect"
@@ -8,9 +9,12 @@ import (
 	"testing/quick"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/twpayne/go-polyline"
 )
 
 func TestUint(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		u            uint
 		s            string
@@ -23,58 +27,61 @@ func TestUint(t *testing.T) {
 		{u: 32, s: "_@"},
 		{u: 174, s: "mD"},
 	} {
-		got, b, err := DecodeUint([]byte(tc.s))
+		got, b, err := polyline.DecodeUint([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Equal(t, tc.u, got)
 		assert.Empty(t, b)
 		if !tc.nonCanonical {
-			assert.Equal(t, []byte(tc.s), EncodeUint(nil, tc.u))
+			assert.Equal(t, []byte(tc.s), polyline.EncodeUint(nil, tc.u))
 		}
 	}
 }
 
 func TestDecodeErrors(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		s   string
 		err error
 	}{
-		{s: ">", err: errInvalidByte},
-		{s: "\x80", err: errInvalidByte},
-		{s: "_", err: errUnterminatedSequence},
+		{s: ">", err: polyline.ErrInvalidByte},
+		{s: "\x80", err: polyline.ErrInvalidByte},
+		{s: "_", err: polyline.ErrUnterminatedSequence},
 	} {
 		var err error
-		_, _, err = DecodeUint([]byte(tc.s))
-		assert.Equal(t, tc.err, err)
-		_, _, err = DecodeInt([]byte(tc.s))
-		assert.Equal(t, tc.err, err)
-		_, _, err = DecodeCoord([]byte(tc.s))
-		assert.Equal(t, tc.err, err)
-		_, _, err = DecodeCoords([]byte(tc.s))
-		assert.Equal(t, tc.err, err)
-		c := Codec{Dim: 1, Scale: 1e5}
+		_, _, err = polyline.DecodeUint([]byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
+		_, _, err = polyline.DecodeInt([]byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
+		_, _, err = polyline.DecodeCoord([]byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
+		_, _, err = polyline.DecodeCoords([]byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
+		c := polyline.Codec{Dim: 1, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0}, []byte(tc.s))
-		assert.Equal(t, tc.err, err)
+		assert.True(t, errors.Is(err, tc.err))
 	}
 }
 
 func TestMultidimensionalDecodeErrors(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		s   string
 		err error
 	}{
-		{s: "_p~iF~ps|U_p~iF>", err: errInvalidByte},
-		{s: "_p~iF~ps|U_p~iF\x80", err: errInvalidByte},
-		{s: "_p~iF~ps|U_p~iF~ps|", err: errUnterminatedSequence},
+		{s: "_p~iF~ps|U_p~iF>", err: polyline.ErrInvalidByte},
+		{s: "_p~iF~ps|U_p~iF\x80", err: polyline.ErrInvalidByte},
+		{s: "_p~iF~ps|U_p~iF~ps|", err: polyline.ErrUnterminatedSequence},
 	} {
-		_, _, err := DecodeCoords([]byte(tc.s))
-		assert.Equal(t, tc.err, err)
-		c := Codec{Dim: 2, Scale: 1e5}
+		_, _, err := polyline.DecodeCoords([]byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
+		c := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s))
-		assert.Equal(t, tc.err, err)
+		assert.True(t, errors.Is(err, tc.err))
 	}
 }
 
 func TestInt(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		i int
 		s string
@@ -87,15 +94,16 @@ func TestInt(t *testing.T) {
 		{i: 255200, s: "_mqN"},
 		{i: -550300, s: "vxq`@"},
 	} {
-		got, b, err := DecodeInt([]byte(tc.s))
+		got, b, err := polyline.DecodeInt([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Empty(t, b)
 		assert.Equal(t, tc.i, got)
-		assert.Equal(t, []byte(tc.s), EncodeInt(nil, tc.i))
+		assert.Equal(t, []byte(tc.s), polyline.EncodeInt(nil, tc.i))
 	}
 }
 
 func TestCoord(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		s            string
 		c            []float64
@@ -111,17 +119,18 @@ func TestCoord(t *testing.T) {
 			nonCanonical: true,
 		},
 	} {
-		got, b, err := DecodeCoord([]byte(tc.s))
+		got, b, err := polyline.DecodeCoord([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Empty(t, b)
 		assert.Equal(t, tc.c, got)
 		if !tc.nonCanonical {
-			assert.Equal(t, []byte(tc.s), EncodeCoord(tc.c))
+			assert.Equal(t, []byte(tc.s), polyline.EncodeCoord(tc.c))
 		}
 	}
 }
 
 func TestCoords(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		cs [][]float64
 		s  string
@@ -131,15 +140,16 @@ func TestCoords(t *testing.T) {
 			s:  "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 	} {
-		got, b, err := DecodeCoords([]byte(tc.s))
+		got, b, err := polyline.DecodeCoords([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Empty(t, b)
 		assert.Equal(t, tc.cs, got)
-		assert.Equal(t, []byte(tc.s), EncodeCoords(tc.cs))
+		assert.Equal(t, []byte(tc.s), polyline.EncodeCoords(tc.cs))
 	}
 }
 
 func TestFlatCoords(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		fcs []float64
 		s   string
@@ -149,17 +159,19 @@ func TestFlatCoords(t *testing.T) {
 			s:   "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 	} {
-		gotFCS, b, err := defaultCodec.DecodeFlatCoords(nil, []byte(tc.s))
+		codec := polyline.Codec{Dim: 2, Scale: 1e5}
+		gotFCS, b, err := codec.DecodeFlatCoords(nil, []byte(tc.s))
 		assert.NoError(t, err)
 		assert.Empty(t, b)
 		assert.Equal(t, tc.fcs, gotFCS)
-		gotBytes, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs)
+		gotBytes, err := codec.EncodeFlatCoords(nil, tc.fcs)
 		assert.NoError(t, err)
 		assert.Equal(t, []byte(tc.s), gotBytes)
 	}
 }
 
 func TestDecodeFlatCoordsErrors(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		fcs []float64
 		s   string
@@ -168,52 +180,56 @@ func TestDecodeFlatCoordsErrors(t *testing.T) {
 		{
 			fcs: []float64{0},
 			s:   "",
-			err: errDimensionalMismatch,
+			err: polyline.ErrDimensionalMismatch,
 		},
 		{
 			fcs: []float64{0},
 			s:   "_p~iF~ps|U",
-			err: errDimensionalMismatch,
+			err: polyline.ErrDimensionalMismatch,
 		},
 		{
 			fcs: []float64{},
 			s:   "_p~iF~ps|U_p~iF",
-			err: errUnterminatedSequence,
+			err: polyline.ErrUnterminatedSequence,
 		},
 	} {
-		_, _, err := defaultCodec.DecodeFlatCoords(tc.fcs, []byte(tc.s))
-		assert.Equal(t, tc.err, err)
+		codec := polyline.Codec{Dim: 2, Scale: 1e5}
+		_, _, err := codec.DecodeFlatCoords(tc.fcs, []byte(tc.s))
+		assert.True(t, errors.Is(err, tc.err))
 	}
 }
 
 func TestEncodeFlatCoordErrors(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		fcs []float64
 		err error
 	}{
 		{
 			fcs: []float64{0},
-			err: errDimensionalMismatch,
+			err: polyline.ErrDimensionalMismatch,
 		},
 	} {
-		_, err := defaultCodec.EncodeFlatCoords(nil, tc.fcs)
-		assert.Equal(t, tc.err, err)
+		codec := polyline.Codec{Dim: 2, Scale: 1e5}
+		_, err := codec.EncodeFlatCoords(nil, tc.fcs)
+		assert.True(t, errors.Is(err, tc.err))
 	}
 }
 
 func TestCodec(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
-		c  Codec
+		c  polyline.Codec
 		cs [][]float64
 		s  string
 	}{
 		{
-			c:  Codec{Dim: 2, Scale: 1e5},
+			c:  polyline.Codec{Dim: 2, Scale: 1e5},
 			cs: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
 			s:  "_p~iF~ps|U_ulLnnqC_mqNvxq`@",
 		},
 		{
-			c:  Codec{Dim: 2, Scale: 1e6},
+			c:  polyline.Codec{Dim: 2, Scale: 1e6},
 			cs: [][]float64{{38.5, -120.2}, {40.7, -120.95}, {43.252, -126.453}},
 			s:  "_izlhA~rlgdF_{geC~ywl@_kwzCn`{nI",
 		},
@@ -249,9 +265,10 @@ func (qc QuickCoords) Generate(r *rand.Rand, size int) reflect.Value {
 }
 
 func TestCoordsQuick(t *testing.T) {
+	t.Parallel()
 	f := func(qc QuickCoords) bool {
-		buf := EncodeCoords([][]float64(qc))
-		cs, buf, err := DecodeCoords(buf)
+		buf := polyline.EncodeCoords([][]float64(qc))
+		cs, buf, err := polyline.DecodeCoords(buf)
 		if len(buf) != 0 || err != nil {
 			return false
 		}
@@ -283,12 +300,14 @@ func (qfc QuickFlatCoords) Generate(r *rand.Rand, size int) reflect.Value {
 }
 
 func TestFlatCoordsQuick(t *testing.T) {
+	t.Parallel()
 	f := func(fqc QuickFlatCoords) bool {
-		buf, err := defaultCodec.EncodeFlatCoords(nil, []float64(fqc))
+		codec := polyline.Codec{Dim: 2, Scale: 1e5}
+		buf, err := codec.EncodeFlatCoords(nil, []float64(fqc))
 		if err != nil {
 			return false
 		}
-		fcs, _, err := defaultCodec.DecodeFlatCoords(nil, buf)
+		fcs, _, err := codec.DecodeFlatCoords(nil, buf)
 		if err != nil {
 			return false
 		}
