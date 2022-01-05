@@ -1,7 +1,6 @@
 package polyline_test
 
 import (
-	"errors"
 	"math"
 	"math/rand"
 	"reflect"
@@ -46,19 +45,19 @@ func TestDecodeErrors(t *testing.T) {
 		{s: ">", err: polyline.ErrInvalidByte},
 		{s: "\x80", err: polyline.ErrInvalidByte},
 		{s: "_", err: polyline.ErrUnterminatedSequence},
+		// {s: "zzzzzzzzzzzzzzzzZ", err: polyline.ErrOverflow},
 	} {
-		var err error
-		_, _, err = polyline.DecodeUint([]byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		_, _, err := polyline.DecodeUint([]byte(tc.s))
+		assert.ErrorIs(t, err, tc.err)
 		_, _, err = polyline.DecodeInt([]byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 		_, _, err = polyline.DecodeCoord([]byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 		_, _, err = polyline.DecodeCoords([]byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 		c := polyline.Codec{Dim: 1, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0}, []byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 	}
 }
 
@@ -73,10 +72,10 @@ func TestMultidimensionalDecodeErrors(t *testing.T) {
 		{s: "_p~iF~ps|U_p~iF~ps|", err: polyline.ErrUnterminatedSequence},
 	} {
 		_, _, err := polyline.DecodeCoords([]byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 		c := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 	}
 }
 
@@ -195,7 +194,7 @@ func TestDecodeFlatCoordsErrors(t *testing.T) {
 	} {
 		codec := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, _, err := codec.DecodeFlatCoords(tc.fcs, []byte(tc.s))
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 	}
 }
 
@@ -212,7 +211,7 @@ func TestEncodeFlatCoordErrors(t *testing.T) {
 	} {
 		codec := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, err := codec.EncodeFlatCoords(nil, tc.fcs)
-		assert.True(t, errors.Is(err, tc.err))
+		assert.ErrorIs(t, err, tc.err)
 	}
 }
 
