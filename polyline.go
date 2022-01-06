@@ -17,12 +17,15 @@ package polyline
 import (
 	"errors"
 	"math"
+	"strconv"
 )
 
 // Errors.
 var (
 	ErrDimensionalMismatch  = errors.New("dimensional mismatch")
+	ErrEmpty                = errors.New("empty")
 	ErrInvalidByte          = errors.New("invalid byte")
+	ErrOverflow             = errors.New("overflow")
 	ErrUnterminatedSequence = errors.New("unterminated sequence")
 )
 
@@ -44,33 +47,54 @@ var defaultCodec = Codec{Dim: 2, Scale: 1e5}
 // DecodeUint decodes a single unsigned integer from buf. It returns the decoded
 // uint, the remaining unconsumed bytes of buf, and any error.
 func DecodeUint(buf []byte) (uint, []byte, error) {
+	if len(buf) == 0 {
+		return 0, nil, ErrEmpty
+	}
+	n := strconv.IntSize / 5
+	if n > len(buf) {
+		n = len(buf)
+	}
 	var u, shift uint
-	for i, b := range buf {
-		switch {
-		case 63 <= b && b < 95:
-			u += (uint(b) - 63) << shift
-			return u, buf[i+1:], nil
+	for i := 0; i < n; i++ {
+		switch b := buf[i]; {
 		case 95 <= b && b < 127:
 			u += (uint(b) - 95) << shift
 			shift += 5
+		case 63 <= b && b < 95:
+			u += (uint(b) - 63) << shift
+			return u, buf[i+1:], nil
 		default:
 			return 0, nil, ErrInvalidByte
 		}
 	}
-	return 0, nil, ErrUnterminatedSequence
+	if len(buf) <= strconv.IntSize/5 {
+		return 0, nil, ErrUnterminatedSequence
+	}
+	max := byte(1<<(strconv.IntSize-5*(strconv.IntSize/5)) - 1)
+	switch b := buf[n]; {
+	case 63 <= b && b <= 63+max:
+		u += (uint(b) - 63) << shift
+		return u, buf[n+1:], nil
+	case b < 127:
+		return 0, nil, ErrOverflow
+	default:
+		return 0, nil, ErrInvalidByte
+	}
 }
 
 // DecodeInt decodes a single signed integer from buf. It returns the decoded
 // int, the remaining unconsumed bytes of buf, and any error.
 func DecodeInt(buf []byte) (int, []byte, error) {
-	u, buf, err := DecodeUint(buf)
-	if err != nil {
+	switch u, buf, err := DecodeUint(buf); {
+	case err != nil:
 		return 0, nil, err
-	}
-	if u&1 == 0 {
+	case u&1 == 0:
 		return int(u >> 1), buf, nil
+	case u == math.MaxUint:
+		return math.MinInt, buf, nil
+	default:
+		return -int((u + 1) >> 1), buf, nil
 	}
-	return -int((u + 1) >> 1), buf, nil
 }
 
 // EncodeUint appends the encoding of a single unsigned integer u to buf and
@@ -115,6 +139,9 @@ func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
 // DecodeCoords decodes an array of coordinates from buf. It returns the
 // coordinates, the remaining unconsumed bytes of buf, and any error.
 func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
+	if len(buf) == 0 {
+		return nil, buf, nil
+	}
 	var coord []float64
 	var err error
 	coord, buf, err = c.DecodeCoord(buf)

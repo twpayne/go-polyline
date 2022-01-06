@@ -1,8 +1,9 @@
 linters:
   enable:
   - asciicheck
+  - bidichk
   - bodyclose
-  - cyclop
+  - contextcheck
   - deadcode
   - depguard
   - dogsled
@@ -39,11 +40,13 @@ linters:
   - ifshort
   - importas
   - ineffassign
+  - ireturn
   - makezero
   - misspell
   - nakedret
   - nestif
   - nilerr
+  - nilnil
   - noctx
   - nolintlint
   - paralleltest
@@ -57,6 +60,7 @@ linters:
   - structcheck
   - stylecheck
   - tagliatelle
+  - tenv
   - testpackage
   - thelper
   - tparallel
@@ -69,10 +73,12 @@ linters:
   - whitespace
   - wrapcheck
   disable:
+  - cyclop
   - gochecknoglobals
   - gomnd
   - lll
   - nlreturn
+  - varnamelen
   - wsl
 
 linters-settings:
