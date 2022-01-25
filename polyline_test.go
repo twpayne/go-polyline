@@ -99,10 +99,10 @@ func TestInt(t *testing.T) {
 		{i: -75000, s: "nnqC"},
 		{i: 255200, s: "_mqN"},
 		{i: -550300, s: "vxq`@"},
-		{i: polyline.MaxInt, s: "}~~~~~~~~~~~N"},
-		{i: polyline.MaxInt - 1, s: "{~~~~~~~~~~~N"},
-		{i: polyline.MinInt + 1, s: "|~~~~~~~~~~~N"},
-		{i: polyline.MinInt, s: "~~~~~~~~~~~~N"},
+		{i: math.MaxInt64, s: "}~~~~~~~~~~~N"},
+		{i: math.MaxInt64 - 1, s: "{~~~~~~~~~~~N"},
+		{i: math.MinInt64 + 1, s: "|~~~~~~~~~~~N"},
+		{i: math.MinInt64, s: "~~~~~~~~~~~~N"},
 	} {
 		got, b, err := polyline.DecodeInt([]byte(tc.s))
 		assert.NoError(t, err)

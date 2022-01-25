@@ -90,8 +90,8 @@ func DecodeInt(buf []byte) (int, []byte, error) {
 		return 0, nil, err
 	case u&1 == 0:
 		return int(u >> 1), buf, nil
-	case u == maxUint:
-		return minInt, buf, nil
+	case u == math.MaxUint64:
+		return math.MinInt64, buf, nil
 	default:
 		return -int((u + 1) >> 1), buf, nil
 	}
