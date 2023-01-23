@@ -335,3 +335,10 @@ func TestFlatCoordsQuick(t *testing.T) {
 	}
 	assert.NoError(t, quick.Check(f, nil))
 }
+
+func FuzzDecodeCoords(f *testing.F) {
+	f.Add([]byte("_p~iF~ps|U"))
+	f.Fuzz(func(t *testing.T, data []byte) {
+		_, _, _ = polyline.DecodeCoords(data)
+	})
+}
