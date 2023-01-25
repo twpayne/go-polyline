@@ -4,7 +4,6 @@ linters:
   - bidichk
   - bodyclose
   - contextcheck
-  - deadcode
   - depguard
   - dogsled
   - dupl
@@ -13,7 +12,6 @@ linters:
   - errname
   - errorlint
   - exhaustive
-  - exhaustivestruct
   - exportloopref
   - forbidigo
   - forcetypeassert
@@ -37,7 +35,6 @@ linters:
   - gosec
   - gosimple
   - govet
-  - ifshort
   - importas
   - ineffassign
   - ireturn
@@ -54,10 +51,7 @@ linters:
   - predeclared
   - promlinter
   - revive
-  - rowserrcheck
-  - sqlclosecheck
   - staticcheck
-  - structcheck
   - stylecheck
   - tagliatelle
   - tenv
@@ -68,8 +62,6 @@ linters:
   - unconvert
   - unparam
   - unused
-  - varcheck
-  - wastedassign
   - whitespace
   - wrapcheck
   disable:
@@ -78,10 +70,18 @@ linters:
   - gomnd
   - lll
   - nlreturn
+  - rowserrcheck # https://github.com/golangci/golangci-lint/issues/264
+  - sqlclosecheck # https://github.com/golangci/golangci-lint/issues/264
   - varnamelen
+  - wastedassign # https://github.com/golangci/golangci-lint/issues/264
   - wsl
 
 linters-settings:
+  gci:
+    sections:
+    - standard
+    - default
+    - prefix(github.com/twpayne/go-polyline)
   goimports:
     local-prefixes: github.com/twpayne/go-polyline
 
