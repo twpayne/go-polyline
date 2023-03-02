@@ -7,7 +7,7 @@ import (
 	"testing"
 	"testing/quick"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-polyline"
 )
@@ -31,7 +31,7 @@ func TestUint(t *testing.T) {
 		got, b, err := polyline.DecodeUint([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Equal(t, tc.u, got)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		if !tc.nonCanonical {
 			assert.Equal(t, []byte(tc.s), polyline.EncodeUint(nil, tc.u))
 		}
@@ -55,16 +55,16 @@ func TestDecodeErrors(t *testing.T) {
 		{s: "~~~~~~~~~~~~\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 	} {
 		_, _, err := polyline.DecodeUint([]byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 		_, _, err = polyline.DecodeInt([]byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 		_, _, err = polyline.DecodeCoord([]byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 		_, _, err = polyline.DecodeCoords([]byte(tc.s))
-		assert.ErrorIs(t, err, tc.coordsErr)
+		assert.Equal(t, tc.coordsErr, err)
 		c := polyline.Codec{Dim: 1, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0}, []byte(tc.s))
-		assert.ErrorIs(t, err, tc.coordsErr)
+		assert.Equal(t, tc.coordsErr, err)
 	}
 }
 
@@ -79,10 +79,10 @@ func TestMultidimensionalDecodeErrors(t *testing.T) {
 		{s: "_p~iF~ps|U_p~iF~ps|", err: polyline.ErrUnterminatedSequence},
 	} {
 		_, _, err := polyline.DecodeCoords([]byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 		c := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, _, err = c.DecodeFlatCoords([]float64{0, 0}, []byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -106,7 +106,7 @@ func TestInt(t *testing.T) {
 	} {
 		got, b, err := polyline.DecodeInt([]byte(tc.s))
 		assert.NoError(t, err)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		assert.Equal(t, tc.i, got)
 		assert.Equal(t, []byte(tc.s), polyline.EncodeInt(nil, tc.i))
 	}
@@ -131,7 +131,7 @@ func TestCoord(t *testing.T) {
 	} {
 		got, b, err := polyline.DecodeCoord([]byte(tc.s))
 		assert.NoError(t, err)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		assert.Equal(t, tc.c, got)
 		if !tc.nonCanonical {
 			assert.Equal(t, []byte(tc.s), polyline.EncodeCoord(tc.c))
@@ -152,7 +152,7 @@ func TestCoords(t *testing.T) {
 	} {
 		got, b, err := polyline.DecodeCoords([]byte(tc.s))
 		assert.NoError(t, err)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		assert.Equal(t, tc.cs, got)
 		assert.Equal(t, []byte(tc.s), polyline.EncodeCoords(tc.cs))
 	}
@@ -172,7 +172,7 @@ func TestFlatCoords(t *testing.T) {
 		codec := polyline.Codec{Dim: 2, Scale: 1e5}
 		gotFCS, b, err := codec.DecodeFlatCoords(nil, []byte(tc.s))
 		assert.NoError(t, err)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		assert.Equal(t, tc.fcs, gotFCS)
 		gotBytes, err := codec.EncodeFlatCoords(nil, tc.fcs)
 		assert.NoError(t, err)
@@ -185,11 +185,11 @@ func TestFlatCoordsEmpty(t *testing.T) {
 	codec := polyline.Codec{Dim: 2, Scale: 1e5}
 	gotFCS, b, err := codec.DecodeFlatCoords(nil, nil)
 	assert.NoError(t, err)
-	assert.Empty(t, b)
-	assert.Empty(t, gotFCS)
+	assert.Equal(t, 0, len(b))
+	assert.Equal(t, 0, len(gotFCS))
 	gotBytes, err := codec.EncodeFlatCoords(nil, nil)
 	assert.NoError(t, err)
-	assert.Empty(t, gotBytes)
+	assert.Equal(t, 0, len(gotBytes))
 }
 
 func TestDecodeFlatCoordsErrors(t *testing.T) {
@@ -215,7 +215,7 @@ func TestDecodeFlatCoordsErrors(t *testing.T) {
 	} {
 		codec := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, _, err := codec.DecodeFlatCoords(tc.fcs, []byte(tc.s))
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -232,7 +232,7 @@ func TestEncodeFlatCoordErrors(t *testing.T) {
 	} {
 		codec := polyline.Codec{Dim: 2, Scale: 1e5}
 		_, err := codec.EncodeFlatCoords(nil, tc.fcs)
-		assert.ErrorIs(t, err, tc.err)
+		assert.Equal(t, tc.err, err)
 	}
 }
 
@@ -257,7 +257,7 @@ func TestCodec(t *testing.T) {
 		got, b, err := tc.c.DecodeCoords([]byte(tc.s))
 		assert.NoError(t, err)
 		assert.Equal(t, tc.cs, got)
-		assert.Empty(t, b)
+		assert.Equal(t, 0, len(b))
 		assert.Equal(t, []byte(tc.s), tc.c.EncodeCoords(nil, tc.cs))
 	}
 }
