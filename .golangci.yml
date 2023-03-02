@@ -46,7 +46,6 @@ linters:
   - nilnil
   - noctx
   - nolintlint
-  - paralleltest
   - prealloc
   - predeclared
   - promlinter
@@ -57,7 +56,6 @@ linters:
   - tenv
   - testpackage
   - thelper
-  - tparallel
   - typecheck
   - unconvert
   - unparam
@@ -70,8 +68,10 @@ linters:
   - gomnd
   - lll
   - nlreturn
+  - paralleltest
   - rowserrcheck # https://github.com/golangci/golangci-lint/issues/264
   - sqlclosecheck # https://github.com/golangci/golangci-lint/issues/264
+  - tparallel
   - varnamelen
   - wastedassign # https://github.com/golangci/golangci-lint/issues/264
   - wsl
