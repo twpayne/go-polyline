@@ -55,7 +55,7 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 		n = len(buf)
 	}
 	var u, shift uint
-	for i := 0; i < n; i++ {
+	for i := range n {
 		switch b := buf[i]; {
 		case 95 <= b && b < 127:
 			u += (uint(b) - 95) << shift
@@ -171,7 +171,7 @@ func (c Codec) DecodeFlatCoords(flatCoords []float64, buf []byte) ([]float64, []
 	}
 	last := make([]int, c.Dim)
 	for len(buf) > 0 {
-		for j := 0; j < c.Dim; j++ {
+		for j := range c.Dim {
 			var err error
 			var k int
 			k, buf, err = DecodeInt(buf)
