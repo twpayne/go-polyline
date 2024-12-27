@@ -70,9 +70,9 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 	if len(buf) <= strconv.IntSize/5 {
 		return 0, nil, ErrUnterminatedSequence
 	}
-	max := byte(1<<(strconv.IntSize-5*(strconv.IntSize/5)) - 1)
+	maxDigit := byte(1<<(strconv.IntSize-5*(strconv.IntSize/5)) - 1)
 	switch b := buf[n]; {
-	case 63 <= b && b <= 63+max:
+	case 63 <= b && b <= 63+maxDigit:
 		u += (uint(b) - 63) << shift
 		return u, buf[n+1:], nil
 	case b < 127:
