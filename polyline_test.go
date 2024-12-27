@@ -346,7 +346,7 @@ func TestFlatCoordsQuick(t *testing.T) {
 
 func FuzzDecodeCoords(f *testing.F) {
 	f.Add([]byte("_p~iF~ps|U"))
-	f.Fuzz(func(t *testing.T, data []byte) {
+	f.Fuzz(func(_ *testing.T, data []byte) {
 		_, _, _ = polyline.DecodeCoords(data)
 	})
 }
