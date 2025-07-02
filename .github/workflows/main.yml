@@ -16,7 +16,7 @@ jobs:
         - oldstable
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a
+    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
       with:
         cache: true
         go-version: ${{ matrix.go-version }}
@@ -24,17 +24,17 @@ jobs:
       run: go build ./...
     - name: Test
       run: go test -covermode=atomic -coverprofile=profile.cov -race ./...
-    - uses: shogo82148/actions-goveralls@7b1bd2871942af030d707d6574e5f684f9891fb2
+    - uses: shogo82148/actions-goveralls@e6875f831db61e6abffbd8df91a2eb6cd24b46c9
       with:
         path-to-profile: profile.cov
   lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a
+    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
       with:
         cache: true
         go-version: stable
-    - uses: golangci/golangci-lint-action@971e284b6050e8a5849b72094c50ab08da042db8
+    - uses: golangci/golangci-lint-action@4afd733a84b1f43292c63897423277bb7f4313a9
       with:
         version: v1.62.2
