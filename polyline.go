@@ -29,13 +29,6 @@ var (
 	ErrUnterminatedSequence = errors.New("unterminated sequence")
 )
 
-func round(x float64) int {
-	if x < 0 {
-		return int(-math.Floor(-x + 0.5))
-	}
-	return int(math.Floor(x + 0.5))
-}
-
 // A Codec represents an encoder.
 type Codec struct {
 	Dim   int     // Dimensionality, normally 2
@@ -185,7 +178,7 @@ func (c Codec) DecodeFlatCoords(flatCoords []float64, buf []byte) ([]float64, []
 // EncodeCoord encodes a single coordinate to buf and returns the new buf.
 func (c Codec) EncodeCoord(buf []byte, coord []float64) []byte {
 	for _, x := range coord {
-		buf = EncodeInt(buf, round(c.Scale*x))
+		buf = EncodeInt(buf, int(math.Round(c.Scale*x)))
 	}
 	return buf
 }
@@ -196,7 +189,7 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 	last := make([]int, c.Dim)
 	for _, coord := range coords {
 		for i, x := range coord {
-			ex := round(c.Scale * x)
+			ex := int(math.Round(c.Scale * x))
 			buf = EncodeInt(buf, ex-last[i])
 			last[i] = ex
 		}
@@ -212,7 +205,7 @@ func (c Codec) EncodeFlatCoords(buf []byte, flatCoords []float64) ([]byte, error
 	}
 	last := make([]int, c.Dim)
 	for i, x := range flatCoords {
-		ex := round(c.Scale * x)
+		ex := int(math.Round(c.Scale * x))
 		j := i % c.Dim
 		buf = EncodeInt(buf, ex-last[j])
 		last[j] = ex
