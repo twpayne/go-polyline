@@ -113,6 +113,9 @@ func EncodeInt(buf []byte, i int) []byte {
 // DecodeCoord decodes a single coordinate from buf. It returns the coordinate,
 // the remaining unconsumed bytes of buf, and any error.
 func (c Codec) DecodeCoord(buf []byte) ([]float64, []byte, error) {
+	if c.Dim <= 0 {
+		return nil, nil, ErrDimensionalMismatch
+	}
 	coord := make([]float64, c.Dim)
 	for i := range coord {
 		var err error
@@ -156,7 +159,7 @@ func (c Codec) DecodeCoords(buf []byte) ([][]float64, []byte, error) {
 // one-dimensional array. It returns the coordinates, the remaining unconsumed
 // bytes in buf, and any error.
 func (c Codec) DecodeFlatCoords(flatCoords []float64, buf []byte) ([]float64, []byte, error) {
-	if len(flatCoords)%c.Dim != 0 {
+	if c.Dim <= 0 || len(flatCoords)%c.Dim != 0 {
 		return nil, nil, ErrDimensionalMismatch
 	}
 	last := make([]int, c.Dim)
@@ -200,7 +203,7 @@ func (c Codec) EncodeCoords(buf []byte, coords [][]float64) []byte {
 // EncodeFlatCoords encodes a one-dimensional array of coordinates to buf. It
 // returns the new buf and any error.
 func (c Codec) EncodeFlatCoords(buf []byte, flatCoords []float64) ([]byte, error) {
-	if len(flatCoords)%c.Dim != 0 {
+	if c.Dim <= 0 || len(flatCoords)%c.Dim != 0 {
 		return nil, ErrDimensionalMismatch
 	}
 	last := make([]int, c.Dim)

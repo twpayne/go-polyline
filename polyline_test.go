@@ -350,3 +350,23 @@ func FuzzDecodeCoords(f *testing.F) {
 		_, _, _ = polyline.DecodeCoords(data)
 	})
 }
+
+func TestInvalidDimensions(t *testing.T) {
+	for _, dim := range []int{0, -1} {
+		t.Run(strconv.Itoa(dim), func(t *testing.T) {
+			c := polyline.Codec{Dim: dim, Scale: 1e5}
+			// Check the primitive first: DecodeCoords cannot make progress
+			// when DecodeCoord succeeds without consuming input.
+			_, _, err := c.DecodeCoord([]byte("??"))
+			if err == nil {
+				t.Fatal("DecodeCoord accepted a nonpositive dimension")
+			}
+			_, _, err = c.DecodeCoords([]byte("??"))
+			assert.Error(t, err)
+			_, _, err = c.DecodeFlatCoords(nil, []byte("??"))
+			assert.Error(t, err)
+			_, err = c.EncodeFlatCoords(nil, []float64{1, 2})
+			assert.Error(t, err)
+		})
+	}
+}
