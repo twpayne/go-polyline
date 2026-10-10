@@ -14,16 +14,18 @@ jobs:
         go-version:
         - stable
         - oldstable
+        go-arch:
+        - '386'
+        - amd64
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e   # v7.0.0
       with:
-        cache: true
         go-version: ${{ matrix.go-version }}
     - name: Build
-      run: go build ./...
+      run: GOARCH=${{ matrix.go-arch }} go build ./...
     - name: Test
-      run: go test -covermode=atomic -coverprofile=profile.cov -race ./...
+      run: GOARCH=${{ matrix.go-arch }} go test -covermode=atomic -coverprofile=profile.cov ./...
     - uses: shogo82148/actions-goveralls@77a1912dca42260ee3e97f61bd13ea7ef40baa93   # v1.11.2
       with:
         path-to-profile: profile.cov
@@ -33,7 +35,6 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e   # v7.0.0
       with:
-        cache: true
         go-version: stable
     - uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a   # v9.3.0
       with:
