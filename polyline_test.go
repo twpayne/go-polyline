@@ -14,6 +14,7 @@ import (
 )
 
 func TestUint(t *testing.T) {
+	suffix := map[int]string{32: "~~~~~B", 64: "~~~~~~~~~~~N"}[strconv.IntSize]
 	for i, tc := range []struct {
 		u            uint
 		s            string
@@ -25,8 +26,8 @@ func TestUint(t *testing.T) {
 		{u: 31, s: "^"},
 		{u: 32, s: "_@"},
 		{u: 174, s: "mD"},
-		{u: 18446744073709551614, s: "}~~~~~~~~~~~N"},
-		{u: 18446744073709551615, s: "~~~~~~~~~~~~N"},
+		{u: math.MaxUint - 1, s: "}" + suffix},
+		{u: math.MaxUint, s: "~" + suffix},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got, b, err := polyline.DecodeUint([]byte(tc.s))
@@ -41,6 +42,8 @@ func TestUint(t *testing.T) {
 }
 
 func TestDecodeErrors(t *testing.T) {
+	unterminated := map[int]string{32: "~~~~~~", 64: "~~~~~~~~~~~~"}[strconv.IntSize]
+	overflowDigit := map[int]string{32: "C", 64: "O"}[strconv.IntSize]
 	for i, tc := range []struct {
 		s         string
 		err       error
@@ -50,10 +53,10 @@ func TestDecodeErrors(t *testing.T) {
 		{s: ">", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 		{s: "\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 		{s: "_", err: polyline.ErrUnterminatedSequence, coordsErr: polyline.ErrUnterminatedSequence},
-		{s: "~~~~~~~~~~~~", err: polyline.ErrUnterminatedSequence, coordsErr: polyline.ErrUnterminatedSequence},
-		{s: "~~~~~~~~~~~~O", err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
-		{s: "~~~~~~~~~~~~_", err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
-		{s: "~~~~~~~~~~~~\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
+		{s: unterminated, err: polyline.ErrUnterminatedSequence, coordsErr: polyline.ErrUnterminatedSequence},
+		{s: unterminated + overflowDigit, err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
+		{s: unterminated + "_", err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
+		{s: unterminated + "\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			_, _, err := polyline.DecodeUint([]byte(tc.s))
@@ -91,6 +94,7 @@ func TestMultidimensionalDecodeErrors(t *testing.T) {
 }
 
 func TestInt(t *testing.T) {
+	suffix := map[int]string{32: "~~~~~B", 64: "~~~~~~~~~~~N"}[strconv.IntSize]
 	for i, tc := range []struct {
 		i int
 		s string
@@ -102,10 +106,10 @@ func TestInt(t *testing.T) {
 		{i: -75000, s: "nnqC"},
 		{i: 255200, s: "_mqN"},
 		{i: -550300, s: "vxq`@"},
-		{i: math.MaxInt64, s: "}~~~~~~~~~~~N"},
-		{i: math.MaxInt64 - 1, s: "{~~~~~~~~~~~N"},
-		{i: math.MinInt64 + 1, s: "|~~~~~~~~~~~N"},
-		{i: math.MinInt64, s: "~~~~~~~~~~~~N"},
+		{i: math.MaxInt, s: "}" + suffix},
+		{i: math.MaxInt - 1, s: "{" + suffix},
+		{i: math.MinInt + 1, s: "|" + suffix},
+		{i: math.MinInt, s: "~" + suffix},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got, b, err := polyline.DecodeInt([]byte(tc.s))
