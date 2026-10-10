@@ -32,14 +32,14 @@ linters:
     - gochecknoinits
     - gochecksumtype
     - gocognit
-    - goconst
     - gocritic
     - gocyclo
+    - godoclint
     - godot
     - godox
     - goheader
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosmopolitan
     - grouper
@@ -95,11 +95,13 @@ linters:
     - zerologlint
   disable:
     - arangolint
+    - clickhouselint
     - cyclop
     - depguard
-    - exhaustruct
+    - exhaustruct_v5
     - funlen
     - gochecknoglobals
+    - goconst
     - gosec
     - mnd
     - nlreturn
@@ -109,7 +111,6 @@ linters:
     - tparallel
     - varnamelen
     - wrapcheck
-    - wsl
     - wsl_v5
   settings:
     misspell:
@@ -143,7 +144,10 @@ formatters:
         - prefix(github.com/twpayne/go-polyline)
     gofumpt:
       module-path: github.com/twpayne/go-polyline
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
+        balance-calls: true
     goimports:
       local-prefixes:
         - github.com/twpayne/go-polyline
