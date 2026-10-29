@@ -54,6 +54,7 @@ func TestDecodeErrors(t *testing.T) {
 		{s: "\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 		{s: "_", err: polyline.ErrUnterminatedSequence, coordsErr: polyline.ErrUnterminatedSequence},
 		{s: unterminated, err: polyline.ErrUnterminatedSequence, coordsErr: polyline.ErrUnterminatedSequence},
+		{s: unterminated + ">", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
 		{s: unterminated + overflowDigit, err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
 		{s: unterminated + "_", err: polyline.ErrOverflow, coordsErr: polyline.ErrOverflow},
 		{s: unterminated + "\x80", err: polyline.ErrInvalidByte, coordsErr: polyline.ErrInvalidByte},
