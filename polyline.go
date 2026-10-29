@@ -65,7 +65,7 @@ func DecodeUint(buf []byte) (uint, []byte, error) {
 	case 63 <= b && b <= 63+maxDigit:
 		u += (uint(b) - 63) << shift
 		return u, buf[n+1:], nil
-	case b < 127:
+	case 63 <= b && b < 127:
 		return 0, nil, ErrOverflow
 	default:
 		return 0, nil, ErrInvalidByte
